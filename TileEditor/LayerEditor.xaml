@@ -1,0 +1,63 @@
+﻿<UserControl x:Class="TileEditor.LayerEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TileEditor"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <DataTemplate x:Key="Empty">
+                <Button 
+                    Command="{Binding DataContext.OnClick, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
+                    CommandParameter="{Binding .}">
+                    <Button.Template>
+                        <ControlTemplate>
+                            <Border Width="64" Height="64" BorderThickness="1" BorderBrush="White">
+                                <StackPanel Background="#303040" 
+                                            VerticalAlignment="Stretch" 
+                                            HorizontalAlignment="Stretch"
+                                            Width="64" Height="64" />
+
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </DataTemplate>
+
+            <DataTemplate x:Key="Normal">
+                <Button
+                    Command="{Binding DataContext.OnClick, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
+                    CommandParameter="{Binding .}">
+                    <Button.Template>
+                        <ControlTemplate>
+                            <Border BorderThickness="1" BorderBrush="White">
+                                <Image Width="64" Height="64">
+                                    <Image.Source>
+                                        <Binding Path="TexturePath"></Binding>
+                                    </Image.Source>
+                                </Image>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </DataTemplate>
+
+            <local:TileSelector x:Key="tileSelector" EmptyTile="{StaticResource Empty}" NormalTile="{StaticResource Normal}" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Visible">
+        <StackPanel VerticalAlignment="Center">
+            <ItemsControl ItemsSource="{Binding LayerTiles}" ItemTemplateSelector="{StaticResource tileSelector}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid HorizontalAlignment="Center" Columns="5" Rows="5" ></UniformGrid>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
