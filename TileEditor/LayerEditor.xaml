@@ -10,39 +10,23 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <DataTemplate x:Key="Empty">
-                <Button 
-                    Command="{Binding DataContext.OnClick, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
-                    CommandParameter="{Binding .}">
-                    <Button.Template>
-                        <ControlTemplate>
-                            <Border Width="64" Height="64" BorderThickness="1" BorderBrush="White">
-                                <StackPanel Background="#303040" 
+                <StackPanel Background="#303040" 
                                             VerticalAlignment="Stretch" 
                                             HorizontalAlignment="Stretch"
-                                            Width="64" Height="64" />
+                                            Width="64" Height="64" >
+                    <Border Width="64" Height="64" BorderThickness="1" BorderBrush="White"></Border>
+                </StackPanel>
 
-                            </Border>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
             </DataTemplate>
 
             <DataTemplate x:Key="Normal">
-                <Button
-                    Command="{Binding DataContext.OnClick, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
-                    CommandParameter="{Binding .}">
-                    <Button.Template>
-                        <ControlTemplate>
-                            <Border BorderThickness="1" BorderBrush="White">
-                                <Image Width="64" Height="64">
-                                    <Image.Source>
-                                        <Binding Path="TexturePath"></Binding>
-                                    </Image.Source>
-                                </Image>
-                            </Border>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+                <Border Width="64" Height="64" BorderThickness="1" BorderBrush="White">
+                    <Image Width="64" Height="64">
+                        <Image.Source>
+                            <Binding Path="TexturePath"></Binding>
+                        </Image.Source>
+                    </Image>
+                </Border>
             </DataTemplate>
 
             <local:TileSelector x:Key="tileSelector" EmptyTile="{StaticResource Empty}" NormalTile="{StaticResource Normal}" />
@@ -61,7 +45,13 @@
             <ItemsControl ItemsSource="{Binding DataContext.LayerTiles, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" ItemTemplateSelector="{StaticResource tileSelector}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid HorizontalAlignment="Center" Columns="{Binding LayerWidth}" Rows="{Binding LayerHeight}" >
+                        <UniformGrid
+                            HorizontalAlignment="Center"
+                            Columns="{Binding LayerWidth}"
+                            Rows="{Binding LayerHeight}"
+                            MouseMove="UniformGrid_MouseMove"
+                            MouseUp="UniformGrid_MouseUp"
+                            MouseDown="UniformGrid_MouseDown">
                         </UniformGrid>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>

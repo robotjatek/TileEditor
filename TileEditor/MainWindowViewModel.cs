@@ -80,10 +80,6 @@ public partial class MainWindowViewModel : ObservableObject
         for (int i = 0; i < _layerWidth * _layerHeight; i++)
         {
             _layerTiles.Add(new EmptyTile());
-            //_layerTiles.Add(new Tile
-            //{
-            //    TexturePath = "D:\\Dev\\webgl-engine\\textures\\ground0.png"
-            //});
         }
 
         WeakReferenceMessenger.Default.Register<SelectedChangeMessage>(this, (r, m) =>
@@ -95,6 +91,12 @@ public partial class MainWindowViewModel : ObservableObject
     public void ReceiveSelectedTile(ValueChangedMessage<Tile> message)
     {
         SelectedTile = message.Value;
+    }
+
+    public Tile GetTile(int x, int y)
+    {
+        var index = y * _layerWidth + x;
+        return _layerTiles[index];
     }
 
     private void OnClickMethod(Tile o)

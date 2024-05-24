@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -10,10 +11,13 @@ namespace TileEditor;
 /// </summary>
 public partial class LayerEditor : UserControl
 {
+    private static readonly double _minZoom = 0.5;
+
     private bool _isScrolling = false;
     private Point _scrollStartPosition;
     private double _zoom = 1.0;
-    private static readonly double _minZoom = 0.5;
+
+    private Vector? _lastTilePosition = null;
 
     public LayerEditor()
     {
@@ -75,5 +79,47 @@ public partial class LayerEditor : UserControl
 
         panel!.LayoutTransform = scale;
         e.Handled = true;
+    }
+
+    private void UniformGrid_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (e.LeftButton == MouseButtonState.Pressed)
+        {
+            var grid = sender as UniformGrid;
+            var mousePosition = e.GetPosition(grid);
+            var gridIdX = (int)mousePosition.X / 64;
+            var gridIdY = (int)mousePosition.Y / 64;
+            var currentTilePosition = new Vector(gridIdX, gridIdY);
+
+            if (!_lastTilePosition.HasValue || currentTilePosition != _lastTilePosition.Value)
+            {
+                var vm = this.DataContext as MainWindowViewModel;
+                var tile = vm!.GetTile(gridIdX, gridIdY);
+                _lastTilePosition = currentTilePosition;
+                vm.OnClick?.Execute(tile);
+            }
+        }
+    }
+
+    private void UniformGrid_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        // Handle single click "paint"
+        if (e.ChangedButton == MouseButton.Left)
+        {
+            var grid = sender as UniformGrid;
+
+            var mousePosition = e.GetPosition(grid);
+            var gridIdX = (int)mousePosition.X / 64;
+            var gridIdY = (int)mousePosition.Y / 64;
+
+            var vm = this.DataContext as MainWindowViewModel;
+            var tile = vm!.GetTile(gridIdX, gridIdY);
+            vm.OnClick?.Execute(tile);
+        }
+    }
+
+    private void UniformGrid_MouseUp(object sender, MouseButtonEventArgs e)
+    {
+        _lastTilePosition = null;
     }
 }
