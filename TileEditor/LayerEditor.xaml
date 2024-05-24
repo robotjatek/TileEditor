@@ -49,12 +49,20 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <ScrollViewer HorizontalScrollBarVisibility="Visible">
-        <StackPanel VerticalAlignment="Center">
-            <ItemsControl ItemsSource="{Binding LayerTiles}" ItemTemplateSelector="{StaticResource tileSelector}">
+    <ScrollViewer
+        HorizontalScrollBarVisibility="Visible"
+        VerticalScrollBarVisibility="Visible"
+        
+        PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
+        MouseDown="ScrollViewer_MouseDown"
+        MouseUp="ScrollViewer_MouseUp"
+        MouseMove="ScrollViewer_MouseMove">
+        <StackPanel VerticalAlignment="Center" Margin="10">
+            <ItemsControl ItemsSource="{Binding DataContext.LayerTiles, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" ItemTemplateSelector="{StaticResource tileSelector}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid HorizontalAlignment="Center" Columns="5" Rows="5" ></UniformGrid>
+                        <UniformGrid HorizontalAlignment="Center" Columns="{Binding LayerWidth}" Rows="{Binding LayerHeight}" >
+                        </UniformGrid>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>

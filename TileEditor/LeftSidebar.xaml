@@ -16,7 +16,7 @@
 
         <local:TileSelectorView Background="Green"/>
 
-        <GridSplitter Grid.Row="1" Height="1" HorizontalAlignment="Stretch" Background="White"/>
+        <GridSplitter Grid.Row="1" Height="2" HorizontalAlignment="Stretch" Background="White"/>
 
         <Border Background="DarkGreen" Grid.Row="2"/>
     </Grid>

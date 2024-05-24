@@ -18,9 +18,17 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">
-            <Button Command="{Binding OnSave}" Height="50">Export level</Button>
-        </StackPanel>
+        <Grid VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Command="{Binding NotImplemented}">New</Button>
+            <Button Grid.Column="1" Command="{Binding NotImplemented}">Import Level</Button>
+            <Button Grid.Column="2" Command="{Binding OnSave}" Height="50">Export level</Button>
+        </Grid>
 
         <Grid Grid.Row="1" Background="#303040">
             <Grid.ColumnDefinitions>

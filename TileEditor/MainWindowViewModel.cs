@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Messaging.Messages;
 using System.ComponentModel;
 using System.IO;
 using System.Text.Json;
+using System.Windows;
 using System.Windows.Input;
 
 using TileEditor.DTOs;
@@ -46,8 +47,14 @@ public class LevelProperties
 // TODO: layer domain object and layer DTO
 public partial class MainWindowViewModel : ObservableObject
 {
-    private const int LayerSize = 25; // TODO: custom layer size (width + height)
     private static readonly JsonSerializerOptions serializeOptions = new() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+    // TODO: configurable bigger numbers
+    [ObservableProperty]
+    private int _layerWidth = 32; // TODO: minimum width based on Environment.ts
+
+    [ObservableProperty]
+    private int _layerHeight = 18; // TODO: minimum height based on Environment.ts
 
     [ObservableProperty]
     private Tile? _selectedTile;
@@ -61,19 +68,22 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private ICommand? _onSave;
 
+    [ObservableProperty]
+    private ICommand? _notImplemented;
+
     public MainWindowViewModel()
     {
         _onClick = new CommandImpl(OnClickMethod);
         _onSave = new CommandImpl(_ => OnSaveMethod());
+        _notImplemented = new CommandImpl(_ => MessageBox.Show("Not implemented", "Err", MessageBoxButton.OK));
 
-        // TODO: Custom width and height for layer
-        for (int i = 0; i < LayerSize; i++)
+        for (int i = 0; i < _layerWidth * _layerHeight; i++)
         {
-            //_layerTiles.Add(new EmptyTile()); // TODO: uncomment this -  init new layer with empty tiles
-            _layerTiles.Add(new Tile
-            {
-                TexturePath = "D:\\Dev\\webgl-engine\\textures\\ground0.png"
-            });
+            _layerTiles.Add(new EmptyTile());
+            //_layerTiles.Add(new Tile
+            //{
+            //    TexturePath = "D:\\Dev\\webgl-engine\\textures\\ground0.png"
+            //});
         }
 
         WeakReferenceMessenger.Default.Register<SelectedChangeMessage>(this, (r, m) =>
@@ -103,8 +113,8 @@ public partial class MainWindowViewModel : ObservableObject
             if (t is EmptyTile)
                 return null;
 
-            var posX = i % 5; // TODO: layer width
-            var posY = i / 5; // TODO: layer witdh
+            var posX = i % _layerWidth;
+            var posY = i / _layerWidth;
             var ingamePath = Path.Combine("textures", Path.GetFileName(t.TexturePath)!); // TODO: game relative path
 
             return new TileEntity
@@ -137,11 +147,11 @@ public partial class MainWindowViewModel : ObservableObject
         {
             Background = "textures/bg.jpg", // TODO: selectable in editor
             GameObjects = [],
-            Music = "audio/level.mp3", // TODO: selectable
+            Music = "audio/level.mp3", // TODO: selectable in editor
             Layers = [layer], // TODO: multi layer support
             LevelEnd = levelEnd, // TODO: place game objects
             Start = start, // TODO: place game objects
-            NextLevel = "levels/level0.json" // TODO: make it configurable
+            NextLevel = "levels/level2.json" // TODO: make it configurable
         };
 
         var levelName = "level1.json"; // TODO: custom level name
