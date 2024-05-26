@@ -10,28 +10,43 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <DataTemplate x:Key="Empty">
-                <StackPanel Background="#303040" 
-                                            VerticalAlignment="Stretch" 
-                                            HorizontalAlignment="Stretch"
-                                            Width="64" Height="64" >
-                    <Border Width="64" Height="64" BorderThickness="1" BorderBrush="White"></Border>
+                <StackPanel Background="#303040"
+                            VerticalAlignment="Stretch" 
+                            HorizontalAlignment="Stretch"
+                            Width="64" Height="64">
+
+                    <Border Width="64" Height="64" BorderThickness="1" BorderBrush="White">
+                        <TextBlock Foreground="White" 
+                                   FontSize="16"
+                                   VerticalAlignment="Center" 
+                                   TextAlignment="Center"
+                                   Text="{Binding GameObject.Type}" />
+                    </Border>
                 </StackPanel>
 
             </DataTemplate>
 
             <DataTemplate x:Key="Normal">
                 <Border Width="64" Height="64" BorderThickness="1" BorderBrush="White">
-                    <Image Width="64" Height="64">
-                        <Image.Source>
-                            <Binding Path="TexturePath"></Binding>
-                        </Image.Source>
-                    </Image>
+                    <Grid>
+                        <Image Width="64" Height="64">
+                            <Image.Source>
+                                <Binding Path="TexturePath"></Binding>
+                            </Image.Source>
+                        </Image>
+                        <TextBlock Foreground="White" 
+                                   FontSize="16"
+                                   VerticalAlignment="Center" 
+                                   TextAlignment="Center"
+                                   Text="{Binding GameObject.Type}" />
+                    </Grid>
                 </Border>
             </DataTemplate>
 
             <local:TileSelector x:Key="tileSelector" EmptyTile="{StaticResource Empty}" NormalTile="{StaticResource Normal}" />
         </ResourceDictionary>
     </UserControl.Resources>
+
 
     <ScrollViewer
         HorizontalScrollBarVisibility="Visible"
@@ -42,16 +57,17 @@
         MouseUp="ScrollViewer_MouseUp"
         MouseMove="ScrollViewer_MouseMove">
         <StackPanel VerticalAlignment="Center" Margin="10">
-            <ItemsControl ItemsSource="{Binding DataContext.LayerTiles, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" ItemTemplateSelector="{StaticResource tileSelector}">
+            <ItemsControl x:Name="itemsControl" ItemsSource="{Binding DataContext.LayerTiles, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" ItemTemplateSelector="{StaticResource tileSelector}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid
-                            HorizontalAlignment="Center"
-                            Columns="{Binding LayerWidth}"
-                            Rows="{Binding LayerHeight}"
-                            MouseMove="UniformGrid_MouseMove"
-                            MouseUp="UniformGrid_MouseUp"
-                            MouseDown="UniformGrid_MouseDown">
+                        <UniformGrid 
+                                x:Name="uniformGrid"
+                                HorizontalAlignment="Center"
+                                Columns="{Binding LayerWidth}"
+                                Rows="{Binding LayerHeight}"
+                                MouseMove="UniformGrid_MouseMove"
+                                MouseUp="UniformGrid_MouseUp"
+                                MouseDown="UniformGrid_MouseDown">
                         </UniformGrid>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>

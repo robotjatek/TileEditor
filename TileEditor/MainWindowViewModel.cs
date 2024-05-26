@@ -1,47 +1,28 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Messaging.Messages;
 
-using System.ComponentModel;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
-using System.Windows.Input;
 
+using TileEditor.Domain;
 using TileEditor.DTOs;
 
 namespace TileEditor;
 
-// TODO: RelayCommand attribute should substitute this
-public class CommandImpl : ICommand
-{
-    private readonly Action<Tile> _execute;
-
-    public event EventHandler? CanExecuteChanged;
-
-    public CommandImpl(Action<Tile> execute)
-    {
-        _execute = execute;
-    }
-
-    public bool CanExecute(object? parameter)
-    {
-        return true;
-    }
-
-    public void Execute(object? parameter)
-    {
-        _execute((parameter as Tile)!);
-    }
-}
-
-
 public class LevelProperties
 {
-
+    public required string BackgroundPath { get; init; }
+    public required string MusicPath { get; init; }
+    public required string NextLevel { get; init; }
+    public required string Name { get; init; }
 }
 
-// TODO: menu for custom level properties: bg, music, name, next level, start position, end position(s)
+// TODO: menu for custom level properties: bg, music, name, next level
+// TODO: start position, end position(s)
 // TODO: layer properties
 // TODO: multi layer support
 // TODO: layer domain object and layer DTO
@@ -49,6 +30,10 @@ public partial class MainWindowViewModel : ObservableObject
 {
     private static readonly JsonSerializerOptions serializeOptions = new() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
+    [ObservableProperty]
+    private int _tabIndex = 0;
+
+    // TODO: resize layer
     // TODO: configurable bigger numbers
     [ObservableProperty]
     private int _layerWidth = 32; // TODO: minimum width based on Environment.ts
@@ -60,31 +45,31 @@ public partial class MainWindowViewModel : ObservableObject
     private Tile? _selectedTile;
 
     [ObservableProperty]
-    private BindingList<Tile> _layerTiles = []; // TODO:  multi layer support
+    private GameObject? _selectedGameObject;
+
+    // TODO: selected layer
 
     [ObservableProperty]
-    private ICommand? _onClick;
+    private ObservableCollection<Tile> _layerTiles = []; // TODO: multi layer support
 
-    [ObservableProperty]
-    private ICommand? _onSave;
-
-    [ObservableProperty]
-    private ICommand? _notImplemented;
 
     public MainWindowViewModel()
     {
-        _onClick = new CommandImpl(OnClickMethod);
-        _onSave = new CommandImpl(_ => OnSaveMethod());
-        _notImplemented = new CommandImpl(_ => MessageBox.Show("Not implemented", "Err", MessageBoxButton.OK));
-
         for (int i = 0; i < _layerWidth * _layerHeight; i++)
         {
-            _layerTiles.Add(new EmptyTile());
+            _layerTiles.Add(new Tile
+            {
+                TexturePath = null,
+            });
         }
 
-        WeakReferenceMessenger.Default.Register<SelectedChangeMessage>(this, (r, m) =>
+        WeakReferenceMessenger.Default.Register<TileSelectedChangeMessage>(this, (r, m) =>
         {
             ReceiveSelectedTile(m);
+        });
+        WeakReferenceMessenger.Default.Register<EntitySelectedChange>(this, (r, m) =>
+        {
+            ReceiveSelectedGameObject(m);
         });
     }
 
@@ -93,31 +78,53 @@ public partial class MainWindowViewModel : ObservableObject
         SelectedTile = message.Value;
     }
 
+    private void ReceiveSelectedGameObject(ValueChangedMessage<GameObject> message)
+    {
+        SelectedGameObject = message.Value;
+    }
+
     public Tile GetTile(int x, int y)
     {
         var index = y * _layerWidth + x;
         return _layerTiles[index];
     }
 
-    private void OnClickMethod(Tile o)
+    /// <summary>
+    /// Places the selected tile or entity to the place of the incoming parameter. 
+    /// In tile edit mode no-op if the parameter is not found in the tiles array
+    /// </summary>
+    /// <param name="clickedTile">The tile that was clicked on</param>
+    public void PlaceSelected(Tile clickedTile)
     {
-        if (SelectedTile != null)
+        if (TabIndex == 0) // tile edit mode
         {
-            var tileIndexInArray = _layerTiles.IndexOf(o);
-            _layerTiles[tileIndexInArray] = SelectedTile!.Clone();
+            if (SelectedTile != null)
+            {
+                var tileIndexInArray = _layerTiles.IndexOf(clickedTile);
+                if (tileIndexInArray >= 0)
+                    _layerTiles[tileIndexInArray] = SelectedTile!.Clone();
+            }
+        }
+        else if (TabIndex == 1) // game object mode
+        {
+            if (SelectedGameObject != null)
+                clickedTile.GameObject = SelectedGameObject.Clone();
         }
     }
 
-    private void OnSaveMethod()
+    [RelayCommand]
+    private void OnSave()
     {
         var tiles = _layerTiles.Select((t, i) =>
         {
-            if (t is EmptyTile)
+            if (t.TexturePath == null)
                 return null;
 
             var posX = i % _layerWidth;
             var posY = i / _layerWidth;
             var ingamePath = Path.Combine("textures", Path.GetFileName(t.TexturePath)!); // TODO: game relative path
+            // TODO: GameRootFolder
+            // TODO: Path.GetRelativePath
 
             return new TileEntity
             {
@@ -145,13 +152,30 @@ public partial class MainWindowViewModel : ObservableObject
             YPos = 0
         };
 
+        var gameObjects = _layerTiles.Select((t, i) =>
+        {
+            var gameObject = t.GameObject;
+            if (gameObject == null)
+                return null;
+
+            var posX = i % _layerWidth;
+            var posY = i / _layerWidth;
+
+            return new GameObjectEntity
+            {
+                Type = gameObject.Type,
+                XPos = posX,
+                YPos = posY
+            };
+        }).Where(g => g != null).ToArray();
+
         var level = new LevelEntity
         {
             Background = "textures/bg.jpg", // TODO: selectable in editor
-            GameObjects = [],
+            GameObjects = gameObjects!,
             Music = "audio/level.mp3", // TODO: selectable in editor
             Layers = [layer], // TODO: multi layer support
-            LevelEnd = levelEnd, // TODO: place game objects
+            LevelEnd = levelEnd,
             Start = start, // TODO: place game objects
             NextLevel = "levels/level2.json" // TODO: make it configurable
         };
@@ -161,5 +185,18 @@ public partial class MainWindowViewModel : ObservableObject
         File.WriteAllText(
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), levelName),
             levelJson); // TODO: async save
+    }
+
+    [RelayCommand]
+    private void OnEdit()
+    {
+        var _editLevelPropertiesWindow = new EditLevelPropertiesWindow();
+        _editLevelPropertiesWindow.ShowDialog();
+    }
+
+    [RelayCommand]
+    private void NotImplemented()
+    {
+        MessageBox.Show("Not implemented", "Err", MessageBoxButton.OK);
     }
 }

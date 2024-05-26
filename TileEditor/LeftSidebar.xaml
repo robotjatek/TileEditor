@@ -10,15 +10,16 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <local:TileSelectorView Background="Green"/>
-
-        <GridSplitter Grid.Row="1" Height="2" HorizontalAlignment="Stretch" Background="White"/>
-
-        <Border Background="DarkGreen" Grid.Row="2"/>
+        <TabControl Background="#303040" BorderThickness="0" SelectedIndex="{Binding TabIndex}">
+            <TabItem Header="Tiles">
+                <local:TileSelectorView/>
+            </TabItem>
+            <TabItem Header="Entities">
+                <local:EntitySelectorControl/>
+            </TabItem>
+        </TabControl>
     </Grid>
 
 

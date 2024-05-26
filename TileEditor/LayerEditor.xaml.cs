@@ -4,6 +4,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
+
 namespace TileEditor;
 
 /// <summary>
@@ -74,7 +75,7 @@ public partial class LayerEditor : UserControl
         }
 
         var scrollView = sender as ScrollViewer;
-        var panel = scrollView!.Content as StackPanel;
+        var panel = scrollView!.Content as FrameworkElement;
         var scale = new ScaleTransform(_zoom, _zoom);
 
         panel!.LayoutTransform = scale;
@@ -96,7 +97,7 @@ public partial class LayerEditor : UserControl
                 var vm = this.DataContext as MainWindowViewModel;
                 var tile = vm!.GetTile(gridIdX, gridIdY);
                 _lastTilePosition = currentTilePosition;
-                vm.OnClick?.Execute(tile);
+                vm.PlaceSelected(tile);
             }
         }
     }
@@ -114,7 +115,7 @@ public partial class LayerEditor : UserControl
 
             var vm = this.DataContext as MainWindowViewModel;
             var tile = vm!.GetTile(gridIdX, gridIdY);
-            vm.OnClick?.Execute(tile);
+            vm.PlaceSelected(tile);
         }
     }
 
