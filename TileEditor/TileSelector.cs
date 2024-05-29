@@ -1,12 +1,13 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+
 using TileEditor.Domain;
 
 namespace TileEditor;
 
 internal class TileSelector : DataTemplateSelector
 {
-    public required DataTemplate EmptyTile {  get; set; }
+    public required DataTemplate EmptyTile { get; set; }
 
     public required DataTemplate NormalTile { get; set; }
 

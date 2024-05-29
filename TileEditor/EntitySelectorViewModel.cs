@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 using TileEditor.Domain;
 
@@ -11,7 +11,7 @@ public partial class EntitySelectorViewModel : ObservableObject
     [ObservableProperty]
     private GameObject? _selected;
 
-    public BindingList<GameObject> Data {  get; set; } = new BindingList<GameObject>([
+    public ObservableCollection<GameObject> Data { get; set; } = new ObservableCollection<GameObject>([
         new GameObject
         {
             Type = "coin"
@@ -19,6 +19,43 @@ public partial class EntitySelectorViewModel : ObservableObject
         new GameObject
         {
             Type = "health"
-        }
+        },
+        new GameObject
+        {
+            Type = "spike"
+        },
+        new GameObject
+        {
+            Type = "cactus"
+        },
+        new GameObject
+        {
+            Type = "slime"
+        },
+        new GameObject
+        {
+            Type = "dragon"
+        },
+
+        new StartGameObject(),
+        new EndGameObject(),
     ]);
+}
+
+
+public class StartGameObject : GameObject
+{
+    public StartGameObject()
+    {
+        Type = "start";
+    }
+}
+
+// TODO: make multiple end objects possible
+public class EndGameObject : GameObject
+{
+    public EndGameObject()
+    {
+        Type = "end";
+    }
 }

@@ -22,7 +22,6 @@ public class LevelProperties
 }
 
 // TODO: menu for custom level properties: bg, music, name, next level
-// TODO: start position, end position(s)
 // TODO: layer properties
 // TODO: multi layer support
 // TODO: layer domain object and layer DTO
@@ -36,10 +35,10 @@ public partial class MainWindowViewModel : ObservableObject
     // TODO: resize layer
     // TODO: configurable bigger numbers
     [ObservableProperty]
-    private int _layerWidth = 32; // TODO: minimum width based on Environment.ts
+    private int _layerWidth = 32; // TODO: this is the minimum width based on Environment.ts
 
     [ObservableProperty]
-    private int _layerHeight = 18; // TODO: minimum height based on Environment.ts
+    private int _layerHeight = 18; // TODO: this is the minimum height based on Environment.ts
 
     [ObservableProperty]
     private Tile? _selectedTile;
@@ -107,8 +106,24 @@ public partial class MainWindowViewModel : ObservableObject
         }
         else if (TabIndex == 1) // game object mode
         {
-            if (SelectedGameObject != null)
-                clickedTile.GameObject = SelectedGameObject.Clone();
+            if (SelectedGameObject == null)
+                return;
+
+            if (SelectedGameObject is StartGameObject)
+            {
+                // remove any existing start objects as only one can be present on a level
+                var existingStart = _layerTiles.Where(t => t.GameObject?.Type == "start").FirstOrDefault();
+                if (existingStart != null)
+                    existingStart.GameObject = null;
+            } 
+            else if (SelectedGameObject is EndGameObject) // TODO: make multiple end objects possible (needs game engine support)
+            {
+                var existingEnd = _layerTiles.Where(t => t.GameObject?.Type == "end").FirstOrDefault();
+                if (existingEnd != null)
+                    existingEnd.GameObject = null;
+            }
+
+            clickedTile.GameObject = SelectedGameObject.Clone();
         }
     }
 
@@ -134,23 +149,13 @@ public partial class MainWindowViewModel : ObservableObject
             };
         }).Where(t => t != null).ToArray();
 
-
         var layer = new LayerEntity
         {
             Tiles = tiles!
         };
 
-        var levelEnd = new LevelEndEntity
-        {
-            XPos = 5,
-            YPos = 5
-        };
-
-        var start = new StartEntity
-        {
-            XPos = 0,
-            YPos = 0
-        };
+        var start = new StartEntity();
+        var levelEnd = new LevelEndEntity();
 
         var gameObjects = _layerTiles.Select((t, i) =>
         {
@@ -161,9 +166,23 @@ public partial class MainWindowViewModel : ObservableObject
             var posX = i % _layerWidth;
             var posY = i / _layerWidth;
 
+            // start is not a "GameObject" as the game expects it, but for the level editor it is convenient to handle it like one
+            if (gameObject.Type == "start")
+            {
+                start.XPos = posX;
+                start.YPos = posY;
+                return null;
+            }
+            else if(gameObject.Type == "end")
+            {
+                levelEnd.XPos = posX;
+                levelEnd.YPos = posY;
+                return null; // TODO: handle level end as a proper game object (Needs engine support)
+            }
+
             return new GameObjectEntity
             {
-                Type = gameObject.Type,
+                Type = gameObject.Type!,
                 XPos = posX,
                 YPos = posY
             };
@@ -176,7 +195,7 @@ public partial class MainWindowViewModel : ObservableObject
             Music = "audio/level.mp3", // TODO: selectable in editor
             Layers = [layer], // TODO: multi layer support
             LevelEnd = levelEnd,
-            Start = start, // TODO: place game objects
+            Start = start,
             NextLevel = "levels/level2.json" // TODO: make it configurable
         };
 

@@ -31,7 +31,7 @@
                     <Grid>
                         <Image Width="64" Height="64">
                             <Image.Source>
-                                <Binding Path="TexturePath"></Binding>
+                                <Binding Path="TexturePath"></Binding> <!-- TODO: itt most databind error van. EmptyTile típust visszahozni? -->
                             </Image.Source>
                         </Image>
                         <TextBlock Foreground="White" 
