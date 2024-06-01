@@ -14,7 +14,9 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <DataTemplate x:Key="Empty">
-                <Border Width="64" Height="64" BorderThickness="1" BorderBrush="White"></Border>
+                <Border BorderThickness="1" BorderBrush="White">
+                    <Grid Width="64" Height="64" />
+                </Border>
             </DataTemplate>
 
             <DataTemplate x:Key="Normal">
@@ -46,7 +48,7 @@
 
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" />
+                    <WrapPanel Orientation="Horizontal"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>

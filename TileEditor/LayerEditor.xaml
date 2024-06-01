@@ -8,9 +8,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <!-- TODO: scrollbar style -->
-    <!-- TODO: global scrollbar style -->
-    
     <UserControl.Resources>
         <ResourceDictionary>
             <DataTemplate x:Key="Empty">
@@ -55,6 +52,7 @@
     <ScrollViewer
         HorizontalScrollBarVisibility="Visible"
         VerticalScrollBarVisibility="Visible"
+        
         
         PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
         MouseDown="ScrollViewer_MouseDown"
