@@ -96,8 +96,11 @@ public partial class LayerEditor : UserControl
             {
                 var vm = this.DataContext as MainWindowViewModel;
                 var tile = vm!.GetTile(gridIdX, gridIdY);
-                _lastTilePosition = currentTilePosition;
-                vm.PlaceSelected(tile);
+                if (tile != null)
+                {
+                    _lastTilePosition = currentTilePosition;
+                    vm.PlaceSelected(tile);
+                }
             }
         }
     }
@@ -115,7 +118,8 @@ public partial class LayerEditor : UserControl
 
             var vm = this.DataContext as MainWindowViewModel;
             var tile = vm!.GetTile(gridIdX, gridIdY);
-            vm.PlaceSelected(tile);
+            if (tile != null)
+                vm.PlaceSelected(tile);
         }
     }
 

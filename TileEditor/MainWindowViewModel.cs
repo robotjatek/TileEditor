@@ -95,9 +95,12 @@ public partial class MainWindowViewModel : ObservableObject
         SelectedGameObject = message.Value;
     }
 
-    public Tile GetTile(int x, int y)
+    public Tile? GetTile(int x, int y)
     {
         var index = y * _layerWidth + x;
+        if (index >= _layerTiles.Count || x > LayerWidth || y > LayerHeight || x < 0 || y < 0)
+            return null;
+
         return _layerTiles[index];
     }
 

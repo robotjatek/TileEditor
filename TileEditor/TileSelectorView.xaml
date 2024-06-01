@@ -19,7 +19,7 @@
 
             <DataTemplate x:Key="Normal">
                 <Border BorderThickness="1" BorderBrush="White">
-                    <Image Width="64" Height="64">
+                    <Image Width="64" Height="64" ToolTip="{Binding TexturePath}">
                         <Image.Source>
                             <Binding Path="TexturePath"></Binding>
                         </Image.Source>
@@ -31,7 +31,12 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <ListBox ItemsSource="{Binding Data}"
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+        <ListBox Grid.Row="0" ItemsSource="{Binding Data}"
              x:Name="listbox"
              Background="#303040"
              SelectedItem="{Binding Selected}"
@@ -39,10 +44,15 @@
              SelectionChanged="ListBox_SelectionChanged"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 
-        <ListBox.ItemsPanel>
-            <ItemsPanelTemplate>
-                <WrapPanel Orientation="Horizontal" />
-            </ItemsPanelTemplate>
-        </ListBox.ItemsPanel>
-    </ListBox>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
+
+        <StackPanel Grid.Row="1">
+            <Button Height="50" Command="{Binding SelectTilesCommand}">Add tiles...</Button>
+        </StackPanel>
+    </Grid>
 </UserControl>
