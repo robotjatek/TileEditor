@@ -150,7 +150,7 @@ public partial class MainWindowViewModel : ObservableObject
 
             var posX = i % _layerWidth;
             var posY = i / _layerWidth;
-            var relativeTexturePath = Path.Combine("textures", Path.GetFileName(t.TexturePath)!).Replace("\\", @"/"); // TODO: almappákban lévő fájlokat is támogatni kéne...
+            var relativeTexturePath = Path.GetRelativePath(GamePath, t.TexturePath).Replace("\\", "/");
 
             return new TileEntity
             {
@@ -229,18 +229,20 @@ public partial class MainWindowViewModel : ObservableObject
         MessageBox.Show("Not implemented", "Err", MessageBoxButton.OK);
     }
 
-    // TODO: almappában lévő fájlok támogatása...
     [RelayCommand]
     private void PickBackground()
     {
         var dialog = new OpenFileDialog()
         {
+            Title = "Select level background",
             InitialDirectory = Path.Combine(GamePath, "textures")
         };
 
-
         if (dialog.ShowDialog() == true)
-            LevelProperties.BackgroundPath = Path.Combine("textures", Path.GetFileName(dialog.FileName)!).Replace("\\", "/");
+        {
+            var relativePath = Path.GetRelativePath(GamePath, dialog.FileName).Replace("\\", "/");
+            LevelProperties.BackgroundPath = relativePath;
+        }
     }
 
     [RelayCommand]
@@ -248,11 +250,15 @@ public partial class MainWindowViewModel : ObservableObject
     {
         var dialog = new OpenFileDialog()
         {
+            Title = "Select level music",
             InitialDirectory = Path.Combine(GamePath, "audio")
         };
 
         if (dialog.ShowDialog() == true)
-            LevelProperties.MusicPath = Path.Combine("audio", Path.GetFileName(dialog.FileName)!).Replace("\\", "/");
+        {
+            var relativePath = Path.GetRelativePath(GamePath, dialog.FileName).Replace("\\", "/");
+            LevelProperties.MusicPath = relativePath;
+        }
     }
 
     [RelayCommand]
@@ -260,9 +266,29 @@ public partial class MainWindowViewModel : ObservableObject
     {
         var dialog = new OpenFileDialog()
         {
+            Title = "Select next level",
             InitialDirectory = Path.Combine(GamePath, "levels")
         };
+
         if (dialog.ShowDialog() == true)
-            LevelProperties.NextLevel = Path.Combine("levels", Path.GetFileName(dialog.FileName)).Replace("\\", "/");
+        {
+            var relativePath = Path.GetRelativePath(GamePath, dialog.FileName).Replace("\\", "/");
+            LevelProperties.NextLevel = relativePath;
+        }
+    }
+
+    [RelayCommand]
+    private void PickGamePath()
+    {
+        var dialog = new OpenFolderDialog()
+        {
+            Title = "Set game folder",
+            InitialDirectory = GamePath,
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            GamePath = dialog.FolderName;
+        }
     }
 }

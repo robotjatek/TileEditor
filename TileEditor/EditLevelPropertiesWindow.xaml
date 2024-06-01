@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TileEditor"
+        d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="Level Properties">
 
@@ -55,22 +56,27 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0">Level name</Label>
-            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding LevelProperties.Name}"></TextBox>
+            <Label Grid.Row="0" Grid.Column="0">GamePath</Label>
+            <TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Text="{Binding GamePath}"></TextBox>
+            <Button Grid.Row="0" Grid.Column="2" Command="{Binding PickGamePathCommand}">...</Button>
 
-            <Label Grid.Row="1" Grid.Column="0">Next Level</Label>
-            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding LevelProperties.NextLevel}"></TextBox>
-            <Button Grid.Row="1" Grid.Column="2" Command="{Binding PickNextLevelCommand}">...</Button>
+            <Label Grid.Row="1" Grid.Column="0">Level name</Label>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding LevelProperties.Name}"></TextBox>
 
-            <Label Grid.Row="2" Grid.Column="0">Background</Label>
-            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding LevelProperties.BackgroundPath}"></TextBox>
-            <Button Grid.Row="2" Grid.Column="2" Command="{Binding PickBackgroundCommand}">...</Button>
+            <Label Grid.Row="2" Grid.Column="0">Next Level</Label>
+            <TextBox Grid.Row="2" Grid.Column="1" IsReadOnly="False" Text="{Binding LevelProperties.NextLevel}"></TextBox>
+            <Button Grid.Row="2" Grid.Column="2" Command="{Binding PickNextLevelCommand}">...</Button>
 
-            <Label Grid.Row="3" Grid.Column="0">Music</Label>
-            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding LevelProperties.MusicPath}"></TextBox>
-            <Button Grid.Row="3" Grid.Column="2" Command="{Binding PickMusicCommand}">...</Button>
+            <Label Grid.Row="3" Grid.Column="0">Background</Label>
+            <TextBox Grid.Row="3" Grid.Column="1" IsReadOnly="True" Text="{Binding LevelProperties.BackgroundPath}"></TextBox>
+            <Button Grid.Row="3" Grid.Column="2" Command="{Binding PickBackgroundCommand}">...</Button>
+
+            <Label Grid.Row="4" Grid.Column="0">Music</Label>
+            <TextBox Grid.Row="4" Grid.Column="1" IsReadOnly="True" Text="{Binding LevelProperties.MusicPath}"></TextBox>
+            <Button Grid.Row="4" Grid.Column="2" Command="{Binding PickMusicCommand}">...</Button>
         </Grid>
     </StackPanel>
 
