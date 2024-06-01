@@ -14,7 +14,7 @@
     
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -47,11 +47,11 @@
 
             <local:LeftSidebar Grid.Column="0" />
 
-            <GridSplitter HorizontalAlignment="Stretch" Width="5" Grid.Row="1" Grid.Column="1" />
+            <GridSplitter Background="#4D4D66" HorizontalAlignment="Stretch" Width="5" Grid.Row="1" Grid.Column="1" />
 
             <local:LayerEditor Grid.Column="2 "/>
 
-            <GridSplitter HorizontalAlignment="Stretch" Width="5" Grid.Row="1" Grid.Column="3" />
+            <GridSplitter Background="#4D4D66" HorizontalAlignment="Stretch" Width="5" Grid.Row="1" Grid.Column="3" />
 
             <Border Grid.Column="4" Background="Blue">
                 <TextBlock>Right</TextBlock>

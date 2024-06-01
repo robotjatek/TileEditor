@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Messaging.Messages;
 
+using Microsoft.Win32;
+
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
@@ -13,20 +15,29 @@ using TileEditor.DTOs;
 
 namespace TileEditor;
 
-public class LevelProperties
+public partial class LevelProperties : ObservableObject
 {
-    public required string BackgroundPath { get; init; }
-    public required string MusicPath { get; init; }
-    public required string NextLevel { get; init; }
-    public required string Name { get; init; }
+    [ObservableProperty]
+    private string _name = "level1.json";
+
+    [ObservableProperty]
+    private string _backgroundPath = "textures/bg.jpg";
+
+    [ObservableProperty]
+    private string _musicPath = "audio/level.mp3";
+
+    [ObservableProperty]
+    private string _nextLevel = "levels/level1.json";
 }
 
-// TODO: menu for custom level properties: bg, music, name, next level
 // TODO: layer properties
 // TODO: multi layer support
 // TODO: layer domain object and layer DTO
 public partial class MainWindowViewModel : ObservableObject
 {
+    [ObservableProperty]
+    private string _gamePath = "D:\\Dev\\webgl-engine";
+
     private static readonly JsonSerializerOptions serializeOptions = new() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     [ObservableProperty]
@@ -51,6 +62,8 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<Tile> _layerTiles = []; // TODO: multi layer support
 
+    [ObservableProperty]
+    private LevelProperties _levelProperties = new();
 
     public MainWindowViewModel()
     {
@@ -115,7 +128,7 @@ public partial class MainWindowViewModel : ObservableObject
                 var existingStart = _layerTiles.Where(t => t.GameObject?.Type == "start").FirstOrDefault();
                 if (existingStart != null)
                     existingStart.GameObject = null;
-            } 
+            }
             else if (SelectedGameObject is EndGameObject) // TODO: make multiple end objects possible (needs game engine support)
             {
                 var existingEnd = _layerTiles.Where(t => t.GameObject?.Type == "end").FirstOrDefault();
@@ -128,7 +141,7 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void OnSave()
+    private async Task OnSave()
     {
         var tiles = _layerTiles.Select((t, i) =>
         {
@@ -137,13 +150,11 @@ public partial class MainWindowViewModel : ObservableObject
 
             var posX = i % _layerWidth;
             var posY = i / _layerWidth;
-            var ingamePath = Path.Combine("textures", Path.GetFileName(t.TexturePath)!); // TODO: game relative path
-            // TODO: GameRootFolder
-            // TODO: Path.GetRelativePath
+            var relativeTexturePath = Path.Combine("textures", Path.GetFileName(t.TexturePath)!).Replace("\\", @"/"); // TODO: almappákban lévő fájlokat is támogatni kéne...
 
             return new TileEntity
             {
-                Texture = ingamePath,
+                Texture = relativeTexturePath,
                 XPos = posX,
                 YPos = posY
             };
@@ -173,7 +184,7 @@ public partial class MainWindowViewModel : ObservableObject
                 start.YPos = posY;
                 return null;
             }
-            else if(gameObject.Type == "end")
+            else if (gameObject.Type == "end")
             {
                 levelEnd.XPos = posX;
                 levelEnd.YPos = posY;
@@ -190,20 +201,19 @@ public partial class MainWindowViewModel : ObservableObject
 
         var level = new LevelEntity
         {
-            Background = "textures/bg.jpg", // TODO: selectable in editor
             GameObjects = gameObjects!,
-            Music = "audio/level.mp3", // TODO: selectable in editor
+            Background = LevelProperties.BackgroundPath,
+            Music = LevelProperties.MusicPath,
+            NextLevel = LevelProperties.NextLevel,
             Layers = [layer], // TODO: multi layer support
             LevelEnd = levelEnd,
-            Start = start,
-            NextLevel = "levels/level2.json" // TODO: make it configurable
+            Start = start
         };
 
-        var levelName = "level1.json"; // TODO: custom level name
-        var levelJson = JsonSerializer.Serialize(level, serializeOptions); // TODO: async serialize
-        File.WriteAllText(
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), levelName),
-            levelJson); // TODO: async save
+        var levelName = LevelProperties.Name;
+
+        await using var fileStream = File.Create(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), levelName));
+        await JsonSerializer.SerializeAsync(fileStream, level, serializeOptions);
     }
 
     [RelayCommand]
@@ -217,5 +227,42 @@ public partial class MainWindowViewModel : ObservableObject
     private void NotImplemented()
     {
         MessageBox.Show("Not implemented", "Err", MessageBoxButton.OK);
+    }
+
+    // TODO: almappában lévő fájlok támogatása...
+    [RelayCommand]
+    private void PickBackground()
+    {
+        var dialog = new OpenFileDialog()
+        {
+            InitialDirectory = Path.Combine(GamePath, "textures")
+        };
+
+
+        if (dialog.ShowDialog() == true)
+            LevelProperties.BackgroundPath = Path.Combine("textures", Path.GetFileName(dialog.FileName)!).Replace("\\", "/");
+    }
+
+    [RelayCommand]
+    private void PickMusic()
+    {
+        var dialog = new OpenFileDialog()
+        {
+            InitialDirectory = Path.Combine(GamePath, "audio")
+        };
+
+        if (dialog.ShowDialog() == true)
+            LevelProperties.MusicPath = Path.Combine("audio", Path.GetFileName(dialog.FileName)!).Replace("\\", "/");
+    }
+
+    [RelayCommand]
+    private void PickNextLevel()
+    {
+        var dialog = new OpenFileDialog()
+        {
+            InitialDirectory = Path.Combine(GamePath, "levels")
+        };
+        if (dialog.ShowDialog() == true)
+            LevelProperties.NextLevel = Path.Combine("levels", Path.GetFileName(dialog.FileName)).Replace("\\", "/");
     }
 }
