@@ -44,7 +44,7 @@
                             <ScrollContentPresenter Grid.Column="0"/>
                             <ScrollBar Name="PART_VerticalScrollBar" Grid.Row="0" Grid.Column="1" Value="{TemplateBinding VerticalOffset}" Maximum="{TemplateBinding ScrollableHeight}" ViewportSize="{TemplateBinding ViewportHeight}" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"/>
                             <ScrollBar Name="PART_HorizontalScrollBar" Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Value="{TemplateBinding HorizontalOffset}" Maximum="{TemplateBinding ScrollableWidth}" ViewportSize="{TemplateBinding ViewportWidth}" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"/>
-                            <Rectangle Grid.Row="1" Grid.Column="1" Fill="{TemplateBinding Background }"/>
+                            <Rectangle Grid.Row="1" Grid.Column="1" Fill="Transparent"/>
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>

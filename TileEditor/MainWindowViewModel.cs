@@ -67,9 +67,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     public MainWindowViewModel()
     {
-        for (int i = 0; i < _layerWidth * _layerHeight; i++)
+        for (int i = 0; i < LayerWidth * LayerHeight; i++)
         {
-            _layerTiles.Add(new Tile
+            LayerTiles.Add(new Tile
             {
                 TexturePath = null,
             });
@@ -97,11 +97,11 @@ public partial class MainWindowViewModel : ObservableObject
 
     public Tile? GetTile(int x, int y)
     {
-        var index = y * _layerWidth + x;
-        if (index >= _layerTiles.Count || x > LayerWidth || y > LayerHeight || x < 0 || y < 0)
+        var index = y * LayerWidth + x;
+        if (index >= LayerTiles.Count || x > LayerWidth || y > LayerHeight || x < 0 || y < 0)
             return null;
 
-        return _layerTiles[index];
+        return LayerTiles[index];
     }
 
     /// <summary>
@@ -109,15 +109,13 @@ public partial class MainWindowViewModel : ObservableObject
     /// In tile edit mode no-op if the parameter is not found in the tiles array
     /// </summary>
     /// <param name="clickedTile">The tile that was clicked on</param>
-    public void PlaceSelected(Tile clickedTile)
+    public void PlaceSelected(int x, int y)
     {
         if (TabIndex == 0) // tile edit mode
         {
             if (SelectedTile != null)
             {
-                var tileIndexInArray = _layerTiles.IndexOf(clickedTile);
-                if (tileIndexInArray >= 0)
-                    _layerTiles[tileIndexInArray] = SelectedTile!.Clone();
+                LayerTiles[y * LayerWidth + x] = SelectedTile.Clone();
             }
         }
         else if (TabIndex == 1) // game object mode
@@ -128,31 +126,33 @@ public partial class MainWindowViewModel : ObservableObject
             if (SelectedGameObject is StartGameObject)
             {
                 // remove any existing start objects as only one can be present on a level
-                var existingStart = _layerTiles.Where(t => t.GameObject?.Type == "start").FirstOrDefault();
+                var existingStart = LayerTiles.Where(t => t.GameObject?.Type == "start").FirstOrDefault();
                 if (existingStart != null)
                     existingStart.GameObject = null;
             }
             else if (SelectedGameObject is EndGameObject) // TODO: make multiple end objects possible (needs game engine support)
             {
-                var existingEnd = _layerTiles.Where(t => t.GameObject?.Type == "end").FirstOrDefault();
+                var existingEnd = LayerTiles.Where(t => t.GameObject?.Type == "end").FirstOrDefault();
                 if (existingEnd != null)
                     existingEnd.GameObject = null;
             }
 
-            clickedTile.GameObject = SelectedGameObject.Clone();
+            var clickedTile = GetTile(x, y);
+            if (clickedTile != null)
+                clickedTile.GameObject = SelectedGameObject.Clone();
         }
     }
 
     [RelayCommand]
     private async Task OnSave()
     {
-        var tiles = _layerTiles.Select((t, i) =>
+        var tiles = LayerTiles.Select((t, i) =>
         {
             if (t.TexturePath == null)
                 return null;
 
-            var posX = i % _layerWidth;
-            var posY = i / _layerWidth;
+            var posX = i % LayerWidth;
+            var posY = i / LayerWidth;
             var relativeTexturePath = Path.GetRelativePath(GamePath, t.TexturePath).Replace("\\", "/");
 
             return new TileEntity
@@ -171,14 +171,14 @@ public partial class MainWindowViewModel : ObservableObject
         var start = new StartEntity();
         var levelEnd = new LevelEndEntity();
 
-        var gameObjects = _layerTiles.Select((t, i) =>
+        var gameObjects = LayerTiles.Select((t, i) =>
         {
             var gameObject = t.GameObject;
             if (gameObject == null)
                 return null;
 
-            var posX = i % _layerWidth;
-            var posY = i / _layerWidth;
+            var posX = i % LayerWidth;
+            var posY = i / LayerWidth;
 
             // start is not a "GameObject" as the game expects it, but for the level editor it is convenient to handle it like one
             if (gameObject.Type == "start")
@@ -292,6 +292,43 @@ public partial class MainWindowViewModel : ObservableObject
         if (dialog.ShowDialog() == true)
         {
             GamePath = dialog.FolderName;
+        }
+    }
+
+    [RelayCommand]
+    private void ResizeLayer()
+    {
+        // TODO: Open dialog with resize options
+
+        // TODO: warn when resized layer cuts off existing tiles
+
+        var resizedX = 50;
+        var resizedY = 50;
+
+        var newLayer = new List<Tile>(resizedX * resizedY);
+        for (int i = 0; i < resizedX * resizedY; i++)
+        {
+            newLayer.Add(new Tile());
+        }
+
+        for (int x = 0; x < resizedX; x++)
+        {
+            for (int y = 0; y < resizedY; y++)
+            {
+                if (x < LayerWidth && y < LayerHeight)
+                {
+                    var tile = GetTile(x, y);
+                    newLayer[y * resizedX + x] = tile ?? new Tile();
+                }
+            }
+        }
+
+        LayerWidth = resizedX;
+        LayerHeight = resizedY;
+        LayerTiles.Clear();
+        foreach (var t in newLayer)
+        {
+            LayerTiles.Add(t);
         }
     }
 }
