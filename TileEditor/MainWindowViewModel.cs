@@ -13,6 +13,8 @@ using System.Windows;
 using TileEditor.Domain;
 using TileEditor.DTOs;
 
+using static TileEditor.ResizeLayerWindowViewModel;
+
 namespace TileEditor;
 
 public partial class LevelProperties : ObservableObject
@@ -43,13 +45,11 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private int _tabIndex = 0;
 
-    // TODO: resize layer
-    // TODO: configurable bigger numbers
     [ObservableProperty]
-    private int _layerWidth = 32; // TODO: this is the minimum width based on Environment.ts
+    private int _layerWidth = 32;
 
     [ObservableProperty]
-    private int _layerHeight = 18; // TODO: this is the minimum height based on Environment.ts
+    private int _layerHeight = 18;
 
     [ObservableProperty]
     private Tile? _selectedTile;
@@ -75,14 +75,9 @@ public partial class MainWindowViewModel : ObservableObject
             });
         }
 
-        WeakReferenceMessenger.Default.Register<TileSelectedChangeMessage>(this, (r, m) =>
-        {
-            ReceiveSelectedTile(m);
-        });
-        WeakReferenceMessenger.Default.Register<EntitySelectedChange>(this, (r, m) =>
-        {
-            ReceiveSelectedGameObject(m);
-        });
+        WeakReferenceMessenger.Default.Register<TileSelectedChangeMessage>(this, (r, m) => ReceiveSelectedTile(m));
+        WeakReferenceMessenger.Default.Register<EntitySelectedChange>(this, (r, m) => ReceiveSelectedGameObject(m));
+        WeakReferenceMessenger.Default.Register<LayerResizeMessage>(this, (r, m) => ReceiveLayerResizeMessage(m));
     }
 
     public void ReceiveSelectedTile(ValueChangedMessage<Tile> message)
@@ -93,6 +88,20 @@ public partial class MainWindowViewModel : ObservableObject
     private void ReceiveSelectedGameObject(ValueChangedMessage<GameObject> message)
     {
         SelectedGameObject = message.Value;
+    }
+
+    private void ReceiveLayerResizeMessage(ValueChangedMessage<LayerSizeProperties> message)
+    {
+        if (message.Value.Height < LayerHeight || message.Value.Width < LayerWidth)
+        {
+            // TODO: proper warn window with editor style instead of this messagebox
+            var result = MessageBox.Show("The dimensions provided are smaller than the current size. This can result in losing tiles. Do you want to proceed?",
+                "Warning", MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.No)
+                return;
+        }
+
+        ResizeLayer(message.Value.Width, message.Value.Height);
     }
 
     public Tile? GetTile(int x, int y)
@@ -295,16 +304,8 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
-    private void ResizeLayer()
+    private void ResizeLayer(int resizedX, int resizedY)
     {
-        // TODO: Open dialog with resize options
-
-        // TODO: warn when resized layer cuts off existing tiles
-
-        var resizedX = 50;
-        var resizedY = 50;
-
         var newLayer = new List<Tile>(resizedX * resizedY);
         for (int i = 0; i < resizedX * resizedY; i++)
         {
@@ -331,4 +332,22 @@ public partial class MainWindowViewModel : ObservableObject
             LayerTiles.Add(t);
         }
     }
+
+    [RelayCommand]
+    private void OpenResizeLayerWindow()
+    {
+        var vm = new ResizeLayerWindowViewModel
+        {
+            Width = LayerWidth,
+            Height = LayerHeight
+        };
+
+        var window = new ResizeLayerWindow()
+        {
+            DataContext = vm
+        };
+        vm.OnRequestClose += (_, _) => window.Close();
+        window.ShowDialog();
+    }
+
 }
