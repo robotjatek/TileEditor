@@ -8,7 +8,6 @@ using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
-using System.Windows;
 
 using TileEditor.Domain;
 using TileEditor.DTOs;

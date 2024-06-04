@@ -108,4 +108,9 @@ public partial class EditorMessageBox : Window
         return [okButton];
     }
 
+    private void Close_Click(object sender, RoutedEventArgs e)
+    {
+        _result = CustomDialogResult.NONE;
+        Close();
+    }
 }
