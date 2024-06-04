@@ -148,12 +148,13 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private async Task OnSave()
     {
-        // TODO: show warning when other layers have game objects than the default
-        // TODO: show warning when there is no default layer selected
-
+        // TODO: Custom error window
         // Must have an existing default layer before save
         if (DefaultLayer == null)
+        {
+            MessageBox.Show("Error: No default layer selected", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
+        }
 
         var layers = new List<LayerEntity>();
         foreach (var item in Layers)
@@ -375,19 +376,25 @@ public partial class MainWindowViewModel : ObservableObject
         }
         Layers.Add(layer);
         if (Layers.Count == 1)
+        {
             layer.IsDefault = true;
+            DefaultLayer = layer;
+        }
     }
 
     [RelayCommand]
     private void RemoveSelectedLayer()
     {
-        // TODO: warn before removing a layer
+        // TODO: custom warn window
+        var result = MessageBox.Show("Remove layer?", "Warning", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+        if (result == MessageBoxResult.OK)
+        {
+            if (SelectedLayer == DefaultLayer)
+                DefaultLayer = null;
 
-        if (SelectedLayer != null)
-            Layers.Remove(SelectedLayer);
-
-        if (SelectedLayer == DefaultLayer)
-            DefaultLayer = null;
+            if (SelectedLayer != null)
+                Layers.Remove(SelectedLayer);
+        }
     }
 
     [RelayCommand]
