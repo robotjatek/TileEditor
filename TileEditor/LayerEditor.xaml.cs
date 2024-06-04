@@ -12,7 +12,7 @@ namespace TileEditor;
 /// </summary>
 public partial class LayerEditor : UserControl
 {
-    private static readonly double _minZoom = 0.5;
+    private static readonly double _minZoom = 0.25;
 
     private bool _isScrolling = false;
     private Point _scrollStartPosition;
@@ -95,12 +95,8 @@ public partial class LayerEditor : UserControl
             if (!_lastTilePosition.HasValue || currentTilePosition != _lastTilePosition.Value)
             {
                 var vm = this.DataContext as MainWindowViewModel;
-                var tile = vm!.GetTile(gridIdX, gridIdY);
-                if (tile != null)
-                {
-                    _lastTilePosition = currentTilePosition;
-                    vm.PlaceSelected(tile);
-                }
+                _lastTilePosition = currentTilePosition;
+                vm!.PlaceSelected(gridIdX, gridIdY);
             }
         }
     }
@@ -117,9 +113,7 @@ public partial class LayerEditor : UserControl
             var gridIdY = (int)mousePosition.Y / 64;
 
             var vm = this.DataContext as MainWindowViewModel;
-            var tile = vm!.GetTile(gridIdX, gridIdY);
-            if (tile != null)
-                vm.PlaceSelected(tile);
+            vm!.PlaceSelected(gridIdX, gridIdY);
         }
     }
 

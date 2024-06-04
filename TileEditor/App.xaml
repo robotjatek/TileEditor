@@ -5,6 +5,44 @@
              StartupUri="MainWindow.xaml">
 
     <Application.Resources>
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <Style TargetType="CheckBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Border BorderBrush="White" BorderThickness="1" Background="#303040" Width="15" Height="15" Padding="2">
+                            <Border x:Name="checkArea" Width="11" Height="11" Background="Transparent"></Border>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="checkArea" Property="Background" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="#303040" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <Style TargetType="ListBox">
+            <Setter Property="Background" Value="#303040" />
+        </Style>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
         <Style TargetType="Button">
             <Setter Property="Background" Value="#303040" />
             <Setter Property="Foreground" Value="White" />
@@ -25,6 +63,10 @@
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#4D4D66" />
                 </Trigger>
+
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#747499" />
+                </Trigger>
             </Style.Triggers>
         </Style>
 
@@ -44,7 +86,7 @@
                             <ScrollContentPresenter Grid.Column="0"/>
                             <ScrollBar Name="PART_VerticalScrollBar" Grid.Row="0" Grid.Column="1" Value="{TemplateBinding VerticalOffset}" Maximum="{TemplateBinding ScrollableHeight}" ViewportSize="{TemplateBinding ViewportHeight}" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"/>
                             <ScrollBar Name="PART_HorizontalScrollBar" Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Value="{TemplateBinding HorizontalOffset}" Maximum="{TemplateBinding ScrollableWidth}" ViewportSize="{TemplateBinding ViewportWidth}" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"/>
-                            <Rectangle Grid.Row="1" Grid.Column="1" Fill="{TemplateBinding Background }"/>
+                            <Rectangle Grid.Row="1" Grid.Column="1" Fill="Transparent"/>
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
@@ -159,7 +201,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate>
-                        <Border Background="{TemplateBinding Background}" BorderBrush="White" BorderThickness="0.8"></Border>
+                        <Border Background="{TemplateBinding Background}" BorderBrush="Transparent" BorderThickness="0.0"></Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>

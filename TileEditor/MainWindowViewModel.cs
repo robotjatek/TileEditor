@@ -13,6 +13,8 @@ using System.Windows;
 using TileEditor.Domain;
 using TileEditor.DTOs;
 
+using static TileEditor.ResizeLayerWindowViewModel;
+
 namespace TileEditor;
 
 public partial class LevelProperties : ObservableObject
@@ -30,9 +32,6 @@ public partial class LevelProperties : ObservableObject
     private string _nextLevel = "levels/level1.json";
 }
 
-// TODO: layer properties
-// TODO: multi layer support
-// TODO: layer domain object and layer DTO
 public partial class MainWindowViewModel : ObservableObject
 {
     [ObservableProperty]
@@ -43,13 +42,11 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private int _tabIndex = 0;
 
-    // TODO: resize layer
-    // TODO: configurable bigger numbers
     [ObservableProperty]
-    private int _layerWidth = 32; // TODO: this is the minimum width based on Environment.ts
+    private int _layerWidth = 32;
 
     [ObservableProperty]
-    private int _layerHeight = 18; // TODO: this is the minimum height based on Environment.ts
+    private int _layerHeight = 18;
 
     [ObservableProperty]
     private Tile? _selectedTile;
@@ -57,32 +54,28 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private GameObject? _selectedGameObject;
 
-    // TODO: selected layer
+    [ObservableProperty]
+    private ObservableCollection<Layer> _layers = [];
 
     [ObservableProperty]
-    private ObservableCollection<Tile> _layerTiles = []; // TODO: multi layer support
+    private Layer? _selectedLayer;
+
+    [ObservableProperty]
+    private Layer? _defaultLayer;
 
     [ObservableProperty]
     private LevelProperties _levelProperties = new();
 
     public MainWindowViewModel()
     {
-        for (int i = 0; i < _layerWidth * _layerHeight; i++)
-        {
-            _layerTiles.Add(new Tile
-            {
-                TexturePath = null,
-            });
-        }
+        // Add one default empty layer on init
+        AddLayer();
+        SelectedLayer = Layers[0];
+        DefaultLayer = Layers[0];
 
-        WeakReferenceMessenger.Default.Register<TileSelectedChangeMessage>(this, (r, m) =>
-        {
-            ReceiveSelectedTile(m);
-        });
-        WeakReferenceMessenger.Default.Register<EntitySelectedChange>(this, (r, m) =>
-        {
-            ReceiveSelectedGameObject(m);
-        });
+        WeakReferenceMessenger.Default.Register<TileSelectedChangeMessage>(this, (r, m) => ReceiveSelectedTile(m));
+        WeakReferenceMessenger.Default.Register<EntitySelectedChange>(this, (r, m) => ReceiveSelectedGameObject(m));
+        WeakReferenceMessenger.Default.Register<LayerResizeMessage>(this, (r, m) => ReceiveLayerResizeMessage(m));
     }
 
     public void ReceiveSelectedTile(ValueChangedMessage<Tile> message)
@@ -95,13 +88,18 @@ public partial class MainWindowViewModel : ObservableObject
         SelectedGameObject = message.Value;
     }
 
-    public Tile? GetTile(int x, int y)
+    private void ReceiveLayerResizeMessage(ValueChangedMessage<LayerSizeProperties> message)
     {
-        var index = y * _layerWidth + x;
-        if (index >= _layerTiles.Count || x > LayerWidth || y > LayerHeight || x < 0 || y < 0)
-            return null;
+        if (message.Value.Height < LayerHeight || message.Value.Width < LayerWidth)
+        {
+            var result = new EditorMessageBox("The dimensions provided are smaller than the current size. This can result in losing tiles. Do you want to proceed?",
+                "Warning", Buttons.OK_CANCEL).ShowDialog();
 
-        return _layerTiles[index];
+            if (result == CustomDialogResult.CANCEL)
+                return;
+        }
+
+        ResizeLayers(message.Value.Width, message.Value.Height);
     }
 
     /// <summary>
@@ -109,15 +107,17 @@ public partial class MainWindowViewModel : ObservableObject
     /// In tile edit mode no-op if the parameter is not found in the tiles array
     /// </summary>
     /// <param name="clickedTile">The tile that was clicked on</param>
-    public void PlaceSelected(Tile clickedTile)
+    public void PlaceSelected(int x, int y)
     {
+        // Only the default layer can have game objects
+        if (SelectedLayer == null || SelectedLayer != DefaultLayer)
+            return;
+
         if (TabIndex == 0) // tile edit mode
         {
             if (SelectedTile != null)
             {
-                var tileIndexInArray = _layerTiles.IndexOf(clickedTile);
-                if (tileIndexInArray >= 0)
-                    _layerTiles[tileIndexInArray] = SelectedTile!.Clone();
+                SelectedLayer.Tiles[y * LayerWidth + x] = SelectedTile.Clone();
             }
         }
         else if (TabIndex == 1) // game object mode
@@ -128,57 +128,70 @@ public partial class MainWindowViewModel : ObservableObject
             if (SelectedGameObject is StartGameObject)
             {
                 // remove any existing start objects as only one can be present on a level
-                var existingStart = _layerTiles.Where(t => t.GameObject?.Type == "start").FirstOrDefault();
+                var existingStart = SelectedLayer.Tiles.Where(t => t.GameObject?.Type == "start").FirstOrDefault();
                 if (existingStart != null)
                     existingStart.GameObject = null;
             }
             else if (SelectedGameObject is EndGameObject) // TODO: make multiple end objects possible (needs game engine support)
             {
-                var existingEnd = _layerTiles.Where(t => t.GameObject?.Type == "end").FirstOrDefault();
+                var existingEnd = SelectedLayer.Tiles.Where(t => t.GameObject?.Type == "end").FirstOrDefault();
                 if (existingEnd != null)
                     existingEnd.GameObject = null;
             }
 
-            clickedTile.GameObject = SelectedGameObject.Clone();
+            var clickedTile = SelectedLayer.GetTile(x, y);
+            if (clickedTile != null)
+                clickedTile.GameObject = SelectedGameObject.Clone();
         }
     }
 
     [RelayCommand]
     private async Task OnSave()
     {
-        var tiles = _layerTiles.Select((t, i) =>
+        // Must have an existing default layer before save
+        if (DefaultLayer == null)
         {
-            if (t.TexturePath == null)
-                return null;
+            new EditorMessageBox("Error: No default layer selected", "Error", Buttons.OK).ShowDialog();
+            return;
+        }
 
-            var posX = i % _layerWidth;
-            var posY = i / _layerWidth;
-            var relativeTexturePath = Path.GetRelativePath(GamePath, t.TexturePath).Replace("\\", "/");
-
-            return new TileEntity
+        var layers = new List<LayerEntity>();
+        foreach (var item in Layers)
+        {
+            var tiles = item.Tiles.Select((t, i) =>
             {
-                Texture = relativeTexturePath,
-                XPos = posX,
-                YPos = posY
-            };
-        }).Where(t => t != null).ToArray();
+                if (t.TexturePath == null)
+                    return null;
 
-        var layer = new LayerEntity
-        {
-            Tiles = tiles!
-        };
+                var posX = i % LayerWidth;
+                var posY = i / LayerWidth;
+                var relativeTexturePath = Path.GetRelativePath(GamePath, t.TexturePath).Replace("\\", "/");
+
+                return new TileEntity
+                {
+                    Texture = relativeTexturePath,
+                    XPos = posX,
+                    YPos = posY
+                };
+            }).Where(t => t != null).ToArray();
+
+            layers.Add(new LayerEntity
+            {
+                Tiles = tiles!
+            });
+        }
 
         var start = new StartEntity();
         var levelEnd = new LevelEndEntity();
 
-        var gameObjects = _layerTiles.Select((t, i) =>
+        var gameObjects = DefaultLayer.Tiles.Select((t, i) =>
         {
             var gameObject = t.GameObject;
             if (gameObject == null)
                 return null;
 
-            var posX = i % _layerWidth;
-            var posY = i / _layerWidth;
+            var posX = i % LayerWidth;
+            var posY = i / LayerWidth;
 
             // start is not a "GameObject" as the game expects it, but for the level editor it is convenient to handle it like one
             if (gameObject.Type == "start")
@@ -208,14 +221,13 @@ public partial class MainWindowViewModel : ObservableObject
             Background = LevelProperties.BackgroundPath,
             Music = LevelProperties.MusicPath,
             NextLevel = LevelProperties.NextLevel,
-            Layers = [layer], // TODO: multi layer support
+            Layers = [.. layers],
             LevelEnd = levelEnd,
             Start = start
         };
 
         var levelName = LevelProperties.Name;
-
-        await using var fileStream = File.Create(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), levelName));
+        await using var fileStream = File.Create(Path.Combine(GamePath, "levels", levelName));
         await JsonSerializer.SerializeAsync(fileStream, level, serializeOptions);
     }
 
@@ -229,7 +241,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void NotImplemented()
     {
-        MessageBox.Show("Not implemented", "Err", MessageBoxButton.OK);
+        new EditorMessageBox("Not implemented", "Error", Buttons.OK).ShowDialog();
     }
 
     [RelayCommand]
@@ -292,6 +304,109 @@ public partial class MainWindowViewModel : ObservableObject
         if (dialog.ShowDialog() == true)
         {
             GamePath = dialog.FolderName;
+        }
+    }
+
+    private void ResizeLayers(int resizedX, int resizedY)
+    {
+        for (int layerIndex = 0; layerIndex < Layers.Count; layerIndex++)
+        {
+            // Create a new empty temp layer
+            var newLayer = new List<Tile>(resizedX * resizedY);
+            for (int i = 0; i < resizedX * resizedY; i++)
+            {
+                newLayer.Add(new Tile());
+            }
+
+            // Copy old data to the new temp layer
+            for (int x = 0; x < resizedX; x++)
+            {
+                for (int y = 0; y < resizedY; y++)
+                {
+                    if (x < LayerWidth && y < LayerHeight)
+                    {
+                        var tile = Layers[layerIndex].GetTile(x, y);
+                        newLayer[y * resizedX + x] = tile ?? new Tile();
+                    }
+                }
+            }
+
+            Layers[layerIndex].Tiles.Clear();
+            Layers[layerIndex].Width = resizedX;
+            Layers[layerIndex].Height = resizedY;
+
+            foreach (var t in newLayer)
+            {
+                Layers[layerIndex].Tiles.Add(t);
+            }
+        }
+
+
+        LayerWidth = resizedX;
+        LayerHeight = resizedY;
+    }
+
+    [RelayCommand]
+    private void OpenResizeLayerWindow()
+    {
+        var vm = new ResizeLayerWindowViewModel
+        {
+            Width = LayerWidth,
+            Height = LayerHeight
+        };
+
+        var window = new ResizeLayerWindow()
+        {
+            DataContext = vm
+        };
+        vm.OnRequestClose += (_, _) => window.Close();
+        window.ShowDialog();
+    }
+
+    [RelayCommand]
+    private void AddLayer()
+    {
+        var layer = new Layer();
+        for (int i = 0; i < LayerWidth * LayerHeight; i++)
+        {
+            layer.Tiles.Add(new Tile());
+        }
+        Layers.Add(layer);
+        if (Layers.Count == 1)
+        {
+            layer.IsDefault = true;
+            DefaultLayer = layer;
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveSelectedLayer()
+    {
+        var result = new EditorMessageBox("Remove layer?", "Warning", Buttons.OK_CANCEL).ShowDialog();
+        if (result == CustomDialogResult.OK)
+        {
+            if (SelectedLayer == DefaultLayer)
+                DefaultLayer = null;
+
+            if (SelectedLayer != null)
+                Layers.Remove(SelectedLayer);
+        }
+    }
+
+    [RelayCommand]
+    private void MakeSelectedLayerDefault()
+    {
+        if (SelectedLayer == null)
+            return;
+
+        if (SelectedLayer != null)
+        {
+            foreach (var layer in Layers)
+            {
+                layer.IsDefault = false;
+            }
+            DefaultLayer = SelectedLayer;
+            DefaultLayer.IsDefault = true;
         }
     }
 }

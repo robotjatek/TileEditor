@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:TileEditor"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
+        WindowStartupLocation="CenterOwner"
         Title="Level Properties">
 
     <Window.Resources>
@@ -20,18 +21,9 @@
             <Setter Property="Margin" Value="4" />
 
             <Style.Resources>
-                <Style TargetType="Label">
-                    <Setter Property="FontSize" Value="16" />
-                    <Setter Property="Foreground" Value="White" />
-                </Style>
-
-                <Style TargetType="TextBox">
+                <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
                     <Setter Property="Margin" Value="0,0,0,10" />
                     <Setter Property="Height" Value="32" />
-                    <Setter Property="FontSize" Value="16" />
-                    <Setter Property="VerticalContentAlignment" Value="Center" />
-                    <Setter Property="Background" Value="#303040" />
-                    <Setter Property="Foreground" Value="White" />
                 </Style>
 
                 <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="Button">
