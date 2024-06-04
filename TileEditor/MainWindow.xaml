@@ -3,14 +3,90 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TileEditor"
+        xmlns:local="clr-namespace:TileEditor" xmlns:shell="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
         mc:Ignorable="d"
         Title="Tile Editor" Height="450" Width="800"
         WindowState="Maximized">
 
+    <WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="42" GlassFrameThickness="0" ResizeBorderThickness="5" CornerRadius="0"/>
+    </WindowChrome.WindowChrome>
+
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
+
+    <Window.Resources>
+        <Style TargetType="local:MainWindow">
+            <Style.Setters>
+                <Setter Property="WindowChrome.WindowChrome">
+                    <Setter.Value>
+                        <WindowChrome />
+                    </Setter.Value>
+                </Setter>
+
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="local:MainWindow">
+                            <Border Padding="10" Background="#4D4D66">
+                                <Grid Background="#303040">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="42" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Title bar -->
+                                    <Grid Grid.Row="0" Background="#4D4D66">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Grid.Column="0" Background="Transparent" Height="36" Width="36" />
+
+                                        <!-- Title -->
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                            <TextBlock FontSize="16" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Title}"   
+                                            VerticalAlignment="Top" HorizontalAlignment="Left"
+                                            Margin="4,0,0,0"/>
+                                        </StackPanel>
+
+                                        <!-- Buttons -->
+                                        <StackPanel
+                                            WindowChrome.IsHitTestVisibleInChrome="True" 
+                                            Grid.Column="2" Orientation="Horizontal">
+
+                                            <Border Width="38" Height="38" Padding="2">
+                                                <Button Click="Minimize_Click">_</Button>
+                                            </Border>
+
+                                            <Border Width="38" Height="38" Padding="2">
+                                                <Button Click="Resize_Click">[ ]</Button>
+                                            </Border>
+
+                                            <Border Width="38" Height="38" Padding="2">
+                                                <Button Style="{StaticResource closeButton}" Click="Close_Click">X</Button>
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Separator Grid.Row="1" />
+
+                                    <!-- content -->
+                                    <Grid Grid.Row="2">
+                                        <ContentPresenter Content="{TemplateBinding Content}" />
+                                    </Grid>
+
+                                </Grid>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style.Setters>
+        </Style>
+    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>

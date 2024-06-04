@@ -8,18 +8,10 @@
         WindowStartupLocation="CenterOwner">
 
     <WindowChrome.WindowChrome>
-        <shell:WindowChrome CaptionHeight="36" GlassFrameThickness="0"/>
+        <shell:WindowChrome CaptionHeight="36" GlassFrameThickness="0" CornerRadius="0"/>
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
-        <Style x:Key="closeButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="Red" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        
         <Style TargetType="local:EditorMessageBox">
             <Setter Property="Background" Value="#303040" />
             <Setter Property="SizeToContent" Value="Height" />
@@ -82,19 +74,6 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
-
-        <Style x:Key="CloseButtonStyle" TargetType="Button">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Grid Width="50" Height="50">
-                            <Border Width="50" Height="50"></Border>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Content" Value="&#xE106;"/>
         </Style>
     </Window.Resources>
 
