@@ -18,12 +18,6 @@
             <Setter Property="ResizeMode" Value="NoResize" />
             <Setter Property="Width" Value="500" />
 
-            <Setter Property="WindowChrome.WindowChrome">
-                <Setter.Value>
-                    <WindowChrome />
-                </Setter.Value>
-            </Setter>
-
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="local:EditorMessageBox">

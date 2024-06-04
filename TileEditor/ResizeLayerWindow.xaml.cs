@@ -11,5 +11,10 @@ public partial class ResizeLayerWindow : Window
     {
         InitializeComponent();
         this.Owner = Application.Current.MainWindow;
-    }    
+    }
+
+    private void Close_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
 }

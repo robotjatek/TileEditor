@@ -19,12 +19,6 @@
     <Window.Resources>
         <Style TargetType="local:MainWindow">
             <Style.Setters>
-                <Setter Property="WindowChrome.WindowChrome">
-                    <Setter.Value>
-                        <WindowChrome />
-                    </Setter.Value>
-                </Setter>
-
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="local:MainWindow">
