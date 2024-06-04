@@ -13,4 +13,9 @@ public partial class EditLevelPropertiesWindow : Window
         this.Owner = Application.Current.MainWindow;
         this.DataContext = Application.Current.MainWindow.DataContext;
     }
+
+    private void Close_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
 }
