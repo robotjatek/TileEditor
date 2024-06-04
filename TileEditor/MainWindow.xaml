@@ -11,7 +11,7 @@
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -55,9 +55,7 @@
 
             <GridSplitter Background="#4D4D66" HorizontalAlignment="Stretch" Width="5" Grid.Row="1" Grid.Column="3" />
 
-            <Border Grid.Column="4" Background="Blue">
-                <Label>Right</Label>
-            </Border>
+            <local:LayerSelector Grid.Column="4" />
         </Grid>
 
     </Grid>

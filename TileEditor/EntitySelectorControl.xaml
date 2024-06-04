@@ -10,7 +10,7 @@
         <local:EntitySelectorViewModel />
     </UserControl.DataContext>
 
-    <ListBox Background="#303040" 
+    <ListBox
              x:Name="listbox"
              ItemsSource="{Binding Data}" 
              SelectedItem="{Binding Selected}" 
@@ -20,7 +20,7 @@
             <DataTemplate>
                 <DockPanel Height="64" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <Border Width="64" Height="64" BorderThickness="1" BorderBrush="White"></Border>
-                    <TextBlock Foreground="White" Padding="16" VerticalAlignment="Stretch" TextBlock.FontSize="24" TextAlignment="Center" Text="{Binding Type}" />
+                    <TextBlock Padding="16" VerticalAlignment="Stretch" TextBlock.FontSize="24" TextAlignment="Center" Text="{Binding Type}" />
                 </DockPanel>
             </DataTemplate>
         </ListBox.ItemTemplate>

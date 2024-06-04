@@ -10,13 +10,39 @@
             <Setter Property="Foreground" Value="White" />
         </Style>
 
+        <Style TargetType="CheckBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Border BorderBrush="White" BorderThickness="1" Background="#303040" Width="15" Height="15" Padding="2">
+                            <Border x:Name="checkArea" Width="11" Height="11" Background="Transparent"></Border>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="checkArea" Property="Background" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="TextBox">
             <Setter Property="FontSize" Value="16" />
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Background" Value="#303040" />
             <Setter Property="Foreground" Value="White" />
         </Style>
-        
+
+        <Style TargetType="ListBox">
+            <Setter Property="Background" Value="#303040" />
+        </Style>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
         <Style TargetType="Button">
             <Setter Property="Background" Value="#303040" />
             <Setter Property="Foreground" Value="White" />

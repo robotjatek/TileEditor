@@ -59,14 +59,14 @@
         MouseUp="ScrollViewer_MouseUp"
         MouseMove="ScrollViewer_MouseMove">
         <StackPanel VerticalAlignment="Center" Margin="10">
-            <ItemsControl x:Name="itemsControl" ItemsSource="{Binding DataContext.LayerTiles, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" ItemTemplateSelector="{StaticResource tileSelector}">
+            <ItemsControl x:Name="itemsControl" ItemsSource="{Binding DataContext.SelectedLayer.Tiles, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" ItemTemplateSelector="{StaticResource tileSelector}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid 
                                 x:Name="uniformGrid"
                                 HorizontalAlignment="Center"
-                                Columns="{Binding LayerWidth}"
-                                Rows="{Binding LayerHeight}"
+                                Columns="{Binding SelectedLayer.Width}"
+                                Rows="{Binding SelectedLayer.Height}"
                                 MouseMove="UniformGrid_MouseMove"
                                 MouseUp="UniformGrid_MouseUp"
                                 MouseDown="UniformGrid_MouseDown">
