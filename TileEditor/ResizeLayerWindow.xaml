@@ -92,29 +92,35 @@
             </TextBox>
 
         </Grid>
-        
+
+        <Separator />
+
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition  Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Command="{Binding ExecuteCommand}" Grid.Column="0">
-                <Button.Style>
-                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ElementName=tbWidth, Path=(Validation.HasError)}" Value="True">
-                                <Setter Property="IsEnabled" Value="False" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding ElementName=tbHeight, Path=(Validation.HasError)}" Value="True">
-                                <Setter Property="IsEnabled" Value="False" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-                OK
-            </Button>
-            <Button Command="{Binding CancelCommand}" Grid.Column="1">Cancel</Button>
+            <Border Grid.Column="0" Padding="5">
+                <Button Command="{Binding ExecuteCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=tbWidth, Path=(Validation.HasError)}" Value="True">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=tbHeight, Path=(Validation.HasError)}" Value="True">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    OK
+                </Button>
+            </Border>
+            <Border Grid.Column="1" Padding="5">
+                <Button Command="{Binding CancelCommand}" Grid.Column="1">Cancel</Button>
+            </Border>
         </Grid>
     </StackPanel>
 </Window>

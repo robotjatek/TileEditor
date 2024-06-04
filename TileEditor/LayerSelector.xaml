@@ -50,7 +50,7 @@
             </Grid.ColumnDefinitions>
 
             <Button Command="{Binding AddLayerCommand}" Grid.Column="0">Add layer</Button>
-            <Button Command="{Binding RemoveSelectedLayerCommand}"  Grid.Column="1">Remove selected layer</Button>
+            <Button Command="{Binding RemoveSelectedLayerCommand}"  Grid.Column="1">Remove selected</Button>
             <Button Command="{Binding MakeSelectedLayerDefaultCommand}" Grid.Column="2">Make default</Button>
         </Grid>
     </Grid>

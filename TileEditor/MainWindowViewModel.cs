@@ -92,10 +92,10 @@ public partial class MainWindowViewModel : ObservableObject
     {
         if (message.Value.Height < LayerHeight || message.Value.Width < LayerWidth)
         {
-            // TODO: proper warn window with editor style instead of this message box
-            var result = MessageBox.Show("The dimensions provided are smaller than the current size. This can result in losing tiles. Do you want to proceed?",
-                "Warning", MessageBoxButton.YesNo);
-            if (result == MessageBoxResult.No)
+            var result = new EditorMessageBox("The dimensions provided are smaller than the current size. This can result in losing tiles. Do you want to proceed?",
+                "Warning", Buttons.OK_CANCEL).ShowDialog();
+
+            if (result == CustomDialogResult.CANCEL)
                 return;
         }
 
@@ -148,11 +148,10 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private async Task OnSave()
     {
-        // TODO: Custom error window
         // Must have an existing default layer before save
         if (DefaultLayer == null)
         {
-            MessageBox.Show("Error: No default layer selected", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            new EditorMessageBox("Error: No default layer selected", "Error", Buttons.OK).ShowDialog();
             return;
         }
 
@@ -228,9 +227,7 @@ public partial class MainWindowViewModel : ObservableObject
         };
 
         var levelName = LevelProperties.Name;
-
-        // TODO: save to GamePath/level/levelName
-        await using var fileStream = File.Create(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), levelName));
+        await using var fileStream = File.Create(Path.Combine(GamePath, "levels", levelName));
         await JsonSerializer.SerializeAsync(fileStream, level, serializeOptions);
     }
 
@@ -244,7 +241,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void NotImplemented()
     {
-        MessageBox.Show("Not implemented", "Err", MessageBoxButton.OK);
+        new EditorMessageBox("Not implemented", "Error", Buttons.OK).ShowDialog();
     }
 
     [RelayCommand]
@@ -385,9 +382,8 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void RemoveSelectedLayer()
     {
-        // TODO: custom warn window
-        var result = MessageBox.Show("Remove layer?", "Warning", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-        if (result == MessageBoxResult.OK)
+        var result = new EditorMessageBox("Remove layer?", "Warning", Buttons.OK_CANCEL).ShowDialog();
+        if (result == CustomDialogResult.OK)
         {
             if (SelectedLayer == DefaultLayer)
                 DefaultLayer = null;
