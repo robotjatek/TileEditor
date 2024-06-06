@@ -102,7 +102,7 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Row="0" Grid.Column="0" Command="{Binding NotImplementedCommand}">New</Button>
-            <Button Grid.Row="0" Grid.Column="1" Command="{Binding NotImplementedCommand}">Import Level</Button>
+            <Button Grid.Row="0" Grid.Column="1" Command="{Binding OpenLevelCommand}">Import Level</Button>
             <Button Grid.Row="0" Grid.Column="2" Command="{Binding SaveCommand}">Export level</Button>
             <Button Grid.Row="0" Grid.Column="3" Command="{Binding EditCommand}">Edit Level Properites</Button>
             <Button Grid.Row="0" Grid.Column="4" Command="{Binding OpenResizeLayerWindowCommand}">Resize layer</Button>

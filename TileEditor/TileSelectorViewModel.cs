@@ -1,15 +1,23 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 
 using Microsoft.Win32;
 
 using System.Collections.ObjectModel;
 using TileEditor.Domain;
 
+using static TileEditor.MainWindowViewModel;
+
 namespace TileEditor;
 
 internal partial class TileSelectorViewModel : ObservableObject
 {
+    public TileSelectorViewModel()
+    {
+        WeakReferenceMessenger.Default.Register<LevelLoadedMessage>(this, (_, m) => ReceiveTileFilenames(m.Value));
+    }
+
     [ObservableProperty]
     private Tile? selected;
 
@@ -36,6 +44,17 @@ internal partial class TileSelectorViewModel : ObservableObject
             {
                 Data.Add(tile);
             }
+        }
+    }
+
+    private void ReceiveTileFilenames(HashSet<string> tileFilenames)
+    {
+        Data.Clear();
+        Data.Add(new Tile());
+        var tiles = tileFilenames.Select(f => new Tile { TexturePath = f });
+        foreach (var tile in tiles)
+        {
+            Data.Add(tile);
         }
     }
 }

@@ -45,11 +45,13 @@ public class LevelEntity
 
     public LayerEntity[] Layers { get; set; }
 
+    public int DefaultLayer { get; set; }
+
     public GameObjectEntity[] GameObjects { get; set; } = [];
 
-    public LevelEndEntity LevelEnd { get; set; }
+    public LevelEndEntity? LevelEnd { get; set; }
 
-    public StartEntity Start { get; set; }
+    public StartEntity? Start { get; set; }
 
     public string NextLevel { get; set; }
 }

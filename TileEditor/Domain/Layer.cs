@@ -9,10 +9,10 @@ namespace TileEditor;
 public partial class Layer : ObservableObject
 {
     [ObservableProperty]
-    private int _width = 32;
+    private int _width;
 
     [ObservableProperty]
-    private int _height = 18;
+    private int _height;
 
     [ObservableProperty]
     private ObservableCollection<Tile> _tiles = [];

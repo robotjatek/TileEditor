@@ -33,10 +33,10 @@ public partial class LevelProperties : ObservableObject
 
 public partial class MainWindowViewModel : ObservableObject
 {
+    private static readonly JsonSerializerOptions serializeOptions = new() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
     [ObservableProperty]
     private string _gamePath = "D:\\Dev\\webgl-engine";
-
-    private static readonly JsonSerializerOptions serializeOptions = new() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     [ObservableProperty]
     private int _tabIndex = 0;
@@ -77,7 +77,7 @@ public partial class MainWindowViewModel : ObservableObject
         WeakReferenceMessenger.Default.Register<LayerResizeMessage>(this, (r, m) => ReceiveLayerResizeMessage(m));
     }
 
-    public void ReceiveSelectedTile(ValueChangedMessage<Tile> message)
+    private void ReceiveSelectedTile(ValueChangedMessage<Tile> message)
     {
         SelectedTile = message.Value;
     }
@@ -108,8 +108,9 @@ public partial class MainWindowViewModel : ObservableObject
     /// <param name="clickedTile">The tile that was clicked on</param>
     public void PlaceSelected(int x, int y)
     {
+        // Early return when there is no selected layer
         // Only the default layer can have game objects
-        if (SelectedLayer == null || SelectedLayer != DefaultLayer)
+        if (SelectedLayer == null || (TabIndex == 1 && SelectedLayer != DefaultLayer))
             return;
 
         if (TabIndex == 0) // tile edit mode
@@ -144,6 +145,9 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    // TODO: warn user when layers other than the default have game objects (these will be lost on export)
+    // TODO: warn user when start is null
+    // TODO: warn user when end is null
     [RelayCommand]
     private async Task OnSave()
     {
@@ -180,8 +184,8 @@ public partial class MainWindowViewModel : ObservableObject
             });
         }
 
-        var start = new StartEntity();
-        var levelEnd = new LevelEndEntity();
+        StartEntity? start = null;
+        LevelEndEntity? levelEnd = null;
 
         var gameObjects = DefaultLayer.Tiles.Select((t, i) =>
         {
@@ -195,14 +199,20 @@ public partial class MainWindowViewModel : ObservableObject
             // start is not a "GameObject" as the game expects it, but for the level editor it is convenient to handle it like one
             if (gameObject.Type == "start")
             {
-                start.XPos = posX;
-                start.YPos = posY;
+                start = new StartEntity
+                {
+                    XPos = posX,
+                    YPos = posY,
+                };
                 return null;
             }
             else if (gameObject.Type == "end")
             {
-                levelEnd.XPos = posX;
-                levelEnd.YPos = posY;
+                levelEnd = new LevelEndEntity
+                {
+                    XPos = posX,
+                    YPos = posY,
+                };
                 return null; // TODO: handle level end as a proper game object (Needs engine support)
             }
 
@@ -222,7 +232,8 @@ public partial class MainWindowViewModel : ObservableObject
             NextLevel = LevelProperties.NextLevel,
             Layers = [.. layers],
             LevelEnd = levelEnd,
-            Start = start
+            Start = start,
+            DefaultLayer = Layers.IndexOf(DefaultLayer)
         };
 
         var levelName = LevelProperties.Name;
@@ -365,7 +376,11 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void AddLayer()
     {
-        var layer = new Layer();
+        var layer = new Layer
+        {
+            Width = LayerWidth,
+            Height = LayerHeight
+        };
         for (int i = 0; i < LayerWidth * LayerHeight; i++)
         {
             layer.Tiles.Add(new Tile());
@@ -408,4 +423,108 @@ public partial class MainWindowViewModel : ObservableObject
             DefaultLayer.IsDefault = true;
         }
     }
+
+    [RelayCommand]
+    private async Task OpenLevel()
+    {
+        var dialog = new OpenFileDialog()
+        {
+            Filter = "JSON|*.json",
+            InitialDirectory = Path.Combine(GamePath, "levels"),
+            Multiselect = false
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            var tileFilenames = new HashSet<string>();
+
+            var filename = dialog.FileName; // Full path to file
+            var json = File.OpenRead(filename);
+            var levelEntity = (await JsonSerializer.DeserializeAsync<LevelEntity>(json, serializeOptions))!;
+
+            var gamePath = Directory.GetParent(Path.GetDirectoryName(filename)!)!.ToString().Replace("\\", "/");
+            var props = new LevelProperties
+            {
+                Name = Path.GetFileName(filename),
+                BackgroundPath = levelEntity.Background,
+                MusicPath = levelEntity.Music,
+                NextLevel = levelEntity.NextLevel,
+            };
+            LevelProperties = props;
+
+            var layers = levelEntity.Layers.Select((layerEntity, i) =>
+            {
+                var layerWidth =  layerEntity.Tiles.Length > 0 ? layerEntity.Tiles.Max(t => t.XPos) + 1 : 0;
+                var layerHeight = layerEntity.Tiles.Length > 0 ? layerEntity.Tiles.Max(t => t.YPos) + 1 : 0;                    
+
+                var tiles = new List<Tile>(layerWidth * layerHeight);
+                for (int index = 0; index < layerWidth * layerHeight; index++)
+                {
+                    tiles.Add(new Tile()); // Fill layer with empty tiles
+                }
+
+                foreach (var item in layerEntity.Tiles)
+                {
+                    var tileIdx = item.YPos * layerWidth + item.XPos;
+                    var texturePath = Path.Combine(gamePath, item.Texture);
+                    tileFilenames.Add(texturePath);
+
+                    var tile = new Tile
+                    {
+                        TexturePath = texturePath
+                    };
+                    tiles[tileIdx] = tile;
+                }
+
+                var currentLayer = new Layer
+                {
+                    IsDefault = i == levelEntity.DefaultLayer,
+                    Tiles = [.. tiles],
+                    Height = layerHeight,
+                    Width = layerWidth,
+                };
+
+                return currentLayer;
+            });
+
+            Layers.Clear();
+            foreach (var layer in layers)
+            {
+                Layers.Add(layer);
+            }
+
+            var defaultLayerWidth = Layers[levelEntity.DefaultLayer].Width;
+            if (levelEntity.Start != null)
+            {
+                var startIndex = levelEntity.Start.YPos * defaultLayerWidth + levelEntity.Start.XPos;
+                Layers[0].Tiles[startIndex].GameObject = new StartGameObject();
+            }
+
+            if (levelEntity.LevelEnd != null)
+            {
+                var endIndex = levelEntity.LevelEnd.YPos * defaultLayerWidth + levelEntity.LevelEnd.XPos;
+                Layers[0].Tiles[endIndex].GameObject = new EndGameObject();
+            }
+
+            // Attach game objects to tiles
+            foreach (var go in levelEntity.GameObjects)
+            {
+                var index = go.YPos * defaultLayerWidth + go.XPos;
+                Layers[0].Tiles[index].GameObject = new GameObject()
+                {
+                    Type = go.Type
+                };
+            }
+
+            LayerWidth = Layers.Select(l => l.Width).Max();
+            LayerHeight = Layers.Select(l => l.Height).Max();
+
+            SelectedLayer = Layers[levelEntity.DefaultLayer];
+            DefaultLayer = Layers[levelEntity.DefaultLayer];
+
+            WeakReferenceMessenger.Default.Send(new LevelLoadedMessage(tileFilenames));
+        }
+    }
+
+    public class LevelLoadedMessage(HashSet<string> value) : ValueChangedMessage<HashSet<string>>(value) { }
 }
