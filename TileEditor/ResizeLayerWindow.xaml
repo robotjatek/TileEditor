@@ -60,7 +60,9 @@
 
                             <!-- Content -->
                             <Grid Grid.Row="2">
-                                <ContentPresenter Content="{TemplateBinding Content}" />
+                                <AdornerDecorator>
+                                    <ContentPresenter Content="{TemplateBinding Content}" />
+                                </AdornerDecorator>
                             </Grid>
                         </Grid>
                     </ControlTemplate>
