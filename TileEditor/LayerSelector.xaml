@@ -21,22 +21,46 @@
 
         <ListBox Grid.Row="0" ItemsSource="{Binding Layers}" 
              SelectedItem="{Binding SelectedLayer}"
-             HorizontalContentAlignment="Stretch">
-            
+             HorizontalContentAlignment="Stretch"
+                 Name="lb">
+
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid Height="64">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8*" />
                             <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        
+
                         <Border Grid.Column="0" Height="64" BorderBrush="White" BorderThickness="1">
                             <Label>Layer</Label>
                         </Border>
                         <Border Padding="5" Grid.Column="1" BorderBrush="White" BorderThickness="1">
                             <CheckBox IsEnabled="False" IsChecked="{Binding IsDefault, Mode=OneWay}"/>
                         </Border>
+
+                        <Grid Grid.Column="2" Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Button Grid.Row="0"
+                                    VerticalAlignment="Stretch"
+                                    FontFamily="Segoe UI Symbol"
+                                    Content="&#xE110;"
+                                    Command="{Binding ElementName=lb, Path=DataContext.MoveLayerUpCommand }"
+                                    CommandParameter="{Binding .}"
+                                    />
+
+                            <Button Grid.Row="1"
+                                    VerticalAlignment="Stretch"
+                                    FontFamily="Segoe UI Symbol"
+                                    Content="&#xE1FD;" 
+                                    Command="{Binding ElementName=lb, Path=DataContext.MoveLayerDownCommand }"
+                                    CommandParameter="{Binding .}"
+                                    />
+                        </Grid>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

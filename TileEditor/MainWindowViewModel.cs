@@ -450,6 +450,34 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void MoveLayerUp(Layer layer)
+    {
+        var layerId = Layers.IndexOf(layer);
+        if (layerId - 1 >= 0)
+        {
+            Layer t = Layers[layerId - 1];
+            Layers[layerId - 1] = layer;
+            Layers[layerId] = t;
+        }
+
+        SelectedLayer = layer;
+    }
+
+    [RelayCommand]
+    private void MoveLayerDown(Layer layer)
+    {
+        var layerId = Layers.IndexOf(layer);
+        if (layerId + 1 < Layers.Count)
+        {
+            Layer t = Layers[layerId + 1];
+            Layers[layerId + 1] = layer;
+            Layers[layerId] = t;
+        }
+
+        SelectedLayer = layer;
+    }
+
+    [RelayCommand]
     private async Task OpenLevel()
     {
         var dialog = new OpenFileDialog()
@@ -522,20 +550,20 @@ public partial class MainWindowViewModel : ObservableObject
             if (levelEntity.Start != null)
             {
                 var startIndex = levelEntity.Start.YPos * defaultLayerWidth + levelEntity.Start.XPos;
-                Layers[0].Tiles[startIndex].GameObject = new StartGameObject();
+                Layers[levelEntity.DefaultLayer].Tiles[startIndex].GameObject = new StartGameObject();
             }
 
             if (levelEntity.LevelEnd != null)
             {
                 var endIndex = levelEntity.LevelEnd.YPos * defaultLayerWidth + levelEntity.LevelEnd.XPos;
-                Layers[0].Tiles[endIndex].GameObject = new EndGameObject();
+                Layers[levelEntity.DefaultLayer].Tiles[endIndex].GameObject = new EndGameObject();
             }
 
             // Attach game objects to tiles
             foreach (var go in levelEntity.GameObjects)
             {
                 var index = go.YPos * defaultLayerWidth + go.XPos;
-                Layers[0].Tiles[index].GameObject = new GameObject()
+                Layers[levelEntity.DefaultLayer].Tiles[index].GameObject = new GameObject()
                 {
                     Type = go.Type
                 };
