@@ -489,95 +489,104 @@ public partial class MainWindowViewModel : ObservableObject
 
         if (dialog.ShowDialog() == true)
         {
-            var tileFilenames = new HashSet<string>();
-
-            var filename = dialog.FileName; // Full path to file
-            var json = File.OpenRead(filename);
-            var levelEntity = (await JsonSerializer.DeserializeAsync<LevelEntity>(json, serializeOptions))!;
-
-            var gamePath = Directory.GetParent(Path.GetDirectoryName(filename)!)!.ToString().Replace("\\", "/");
-            var props = new LevelProperties
+            try
             {
-                Name = Path.GetFileName(filename),
-                BackgroundPath = levelEntity.Background,
-                MusicPath = levelEntity.Music,
-                NextLevel = levelEntity.NextLevel,
-            };
-            LevelProperties = props;
+                var tileFilenames = new HashSet<string>();
 
-            var layers = levelEntity.Layers.Select((layerEntity, i) =>
-            {
-                var layerWidth = layerEntity.Tiles.Length > 0 ? layerEntity.Tiles.Max(t => t.XPos) + 1 : 0;
-                var layerHeight = layerEntity.Tiles.Length > 0 ? layerEntity.Tiles.Max(t => t.YPos) + 1 : 0;
+                var filename = dialog.FileName; // Full path to file
+                var json = File.OpenRead(filename);
+                var levelEntity = (await JsonSerializer.DeserializeAsync<LevelEntity>(json, serializeOptions))!;
 
-                var tiles = new List<Tile>(layerWidth * layerHeight);
-                for (int index = 0; index < layerWidth * layerHeight; index++)
+                var gamePath = Directory.GetParent(Path.GetDirectoryName(filename)!)!.ToString().Replace("\\", "/");
+                var props = new LevelProperties
                 {
-                    tiles.Add(new Tile()); // Fill layer with empty tiles
-                }
+                    Name = Path.GetFileName(filename),
+                    BackgroundPath = levelEntity.Background,
+                    MusicPath = levelEntity.Music,
+                    NextLevel = levelEntity.NextLevel,
+                };
+                LevelProperties = props;
 
-                foreach (var item in layerEntity.Tiles)
+                var layerTiles = levelEntity.Layers.SelectMany(l => l.Tiles).ToArray();
+                var layerWidth = layerTiles.Length > 0 ? layerTiles.Select(t => t.XPos).Max() + 1 : 0;
+                var layerHeight = layerTiles.Length > 0 ? layerTiles.Select(t => t.YPos).Max() + 1 : 0;
+
+                var layers = levelEntity.Layers.Select((layerEntity, i) =>
                 {
-                    var tileIdx = item.YPos * layerWidth + item.XPos;
-                    var texturePath = Path.Combine(gamePath, item.Texture);
-                    tileFilenames.Add(texturePath);
-
-                    var tile = new Tile
+                    var tiles = new List<Tile>(layerWidth * layerHeight);
+                    for (int index = 0; index < layerWidth * layerHeight; index++)
                     {
-                        TexturePath = texturePath
+                        tiles.Add(new Tile()); // Fill layer with empty tiles
+                    }
+
+                    foreach (var item in layerEntity.Tiles)
+                    {
+                        var tileIdx = item.YPos * layerWidth + item.XPos;
+                        var texturePath = Path.Combine(gamePath, item.Texture);
+                        tileFilenames.Add(texturePath);
+
+                        var tile = new Tile
+                        {
+                            TexturePath = texturePath
+                        };
+                        tiles[tileIdx] = tile;
+                    }
+
+                    var currentLayer = new Layer
+                    {
+                        IsDefault = i == levelEntity.DefaultLayer,
+                        Tiles = [.. tiles],
+                        Height = layerHeight,
+                        Width = layerWidth,
                     };
-                    tiles[tileIdx] = tile;
+
+                    return currentLayer;
+                });
+
+                Layers.Clear();
+                foreach (var layer in layers)
+                {
+                    Layers.Add(layer);
                 }
 
-                var currentLayer = new Layer
+                var defaultLayerWidth = Layers[levelEntity.DefaultLayer].Width;
+                if (levelEntity.Start != null)
                 {
-                    IsDefault = i == levelEntity.DefaultLayer,
-                    Tiles = [.. tiles],
-                    Height = layerHeight,
-                    Width = layerWidth,
-                };
+                    var startIndex = levelEntity.Start.YPos * defaultLayerWidth + levelEntity.Start.XPos;
+                    Layers[levelEntity.DefaultLayer].Tiles[startIndex].GameObject = new StartGameObject();
+                }
 
-                return currentLayer;
-            });
-
-            Layers.Clear();
-            foreach (var layer in layers)
-            {
-                Layers.Add(layer);
-            }
-
-            var defaultLayerWidth = Layers[levelEntity.DefaultLayer].Width;
-            if (levelEntity.Start != null)
-            {
-                var startIndex = levelEntity.Start.YPos * defaultLayerWidth + levelEntity.Start.XPos;
-                Layers[levelEntity.DefaultLayer].Tiles[startIndex].GameObject = new StartGameObject();
-            }
-
-            if (levelEntity.LevelEnd != null)
-            {
-                var endIndex = levelEntity.LevelEnd.YPos * defaultLayerWidth + levelEntity.LevelEnd.XPos;
-                Layers[levelEntity.DefaultLayer].Tiles[endIndex].GameObject = new EndGameObject();
-            }
-
-            // Attach game objects to tiles
-            foreach (var go in levelEntity.GameObjects)
-            {
-                var index = go.YPos * defaultLayerWidth + go.XPos;
-                Layers[levelEntity.DefaultLayer].Tiles[index].GameObject = new GameObject()
+                if (levelEntity.LevelEnd != null)
                 {
-                    Type = go.Type
-                };
+                    var endIndex = levelEntity.LevelEnd.YPos * defaultLayerWidth + levelEntity.LevelEnd.XPos;
+                    Layers[levelEntity.DefaultLayer].Tiles[endIndex].GameObject = new EndGameObject();
+                }
+
+                // Attach game objects to tiles
+                foreach (var go in levelEntity.GameObjects)
+                {
+                    var index = go.YPos * defaultLayerWidth + go.XPos;
+                    Layers[levelEntity.DefaultLayer].Tiles[index].GameObject = new GameObject()
+                    {
+                        Type = go.Type
+                    };
+                }
+
+                LayerWidth = Layers.Select(l => l.Width).Max();
+                LayerHeight = Layers.Select(l => l.Height).Max();
+
+                SelectedLayer = Layers[levelEntity.DefaultLayer];
+                DefaultLayer = Layers[levelEntity.DefaultLayer];
+
+                WindowTitle = $"TileEditor - {LevelProperties.Name}";
+
+                WeakReferenceMessenger.Default.Send(new LevelLoadedMessage(tileFilenames));
             }
-
-            LayerWidth = Layers.Select(l => l.Width).Max();
-            LayerHeight = Layers.Select(l => l.Height).Max();
-
-            SelectedLayer = Layers[levelEntity.DefaultLayer];
-            DefaultLayer = Layers[levelEntity.DefaultLayer];
-
-            WindowTitle = $"TileEditor - {LevelProperties.Name}";
-
-            WeakReferenceMessenger.Default.Send(new LevelLoadedMessage(tileFilenames));
+            catch (Exception ex)
+            {
+                new EditorMessageBox(ex.Message, "Error", Buttons.OK).ShowDialog();
+                // TODO: reinit everything to zero
+            }
         }
     }
 
