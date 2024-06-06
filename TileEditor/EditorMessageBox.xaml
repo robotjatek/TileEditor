@@ -61,7 +61,7 @@
                             <Separator Grid.Row="1" />
 
                             <!-- Content -->
-                            <Border Grid.Row="2" Background="#303040">
+                            <Border Grid.Row="2" Background="#303040" Margin="5">
                                 <ContentPresenter Content="{TemplateBinding Content}" />
                             </Border>
                         </Grid>

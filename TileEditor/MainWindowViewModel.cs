@@ -36,6 +36,9 @@ public partial class MainWindowViewModel : ObservableObject
     private static readonly JsonSerializerOptions serializeOptions = new() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     [ObservableProperty]
+    private string _windowTitle = "TileEditor";
+
+    [ObservableProperty]
     private string _gamePath = "D:\\Dev\\webgl-engine";
 
     [ObservableProperty]
@@ -145,9 +148,6 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    // TODO: warn user when layers other than the default have game objects (these will be lost on export)
-    // TODO: warn user when start is null
-    // TODO: warn user when end is null
     [RelayCommand]
     private async Task OnSave()
     {
@@ -223,6 +223,31 @@ public partial class MainWindowViewModel : ObservableObject
                 YPos = posY
             };
         }).Where(g => g != null).ToArray();
+
+        if (levelEnd is null)
+        {
+            var result = new EditorMessageBox("Level end is not set. Levels like this can be saved, but the game wont work with incomplete levels. Do you want to proceed?",
+                "Warning", Buttons.OK_CANCEL).ShowDialog();
+            if (result != CustomDialogResult.OK)
+                return;
+        }
+
+        if (start is null)
+        {
+            var result = new EditorMessageBox("Level start is not set. Levels like this can be saved, but the game wont work with incomplete levels. Do you want to proceed?",
+                "Warning", Buttons.OK_CANCEL).ShowDialog();
+            if (result != CustomDialogResult.OK)
+                return;
+        }
+
+        var nonDefaultLayerHasGameObjects = Layers.Where(l => l != DefaultLayer).SelectMany(l => l.Tiles).Any(t => t.GameObject != null);
+        if (nonDefaultLayerHasGameObjects)
+        {
+            var result = new EditorMessageBox("Layers other than the default have entities defined. Those will be lost on export. Do you want to proceed?",
+                "Warning", Buttons.OK_CANCEL).ShowDialog();
+            if (result != CustomDialogResult.OK)
+                return;
+        }
 
         var level = new LevelEntity
         {
@@ -454,8 +479,8 @@ public partial class MainWindowViewModel : ObservableObject
 
             var layers = levelEntity.Layers.Select((layerEntity, i) =>
             {
-                var layerWidth =  layerEntity.Tiles.Length > 0 ? layerEntity.Tiles.Max(t => t.XPos) + 1 : 0;
-                var layerHeight = layerEntity.Tiles.Length > 0 ? layerEntity.Tiles.Max(t => t.YPos) + 1 : 0;                    
+                var layerWidth = layerEntity.Tiles.Length > 0 ? layerEntity.Tiles.Max(t => t.XPos) + 1 : 0;
+                var layerHeight = layerEntity.Tiles.Length > 0 ? layerEntity.Tiles.Max(t => t.YPos) + 1 : 0;
 
                 var tiles = new List<Tile>(layerWidth * layerHeight);
                 for (int index = 0; index < layerWidth * layerHeight; index++)
@@ -521,6 +546,8 @@ public partial class MainWindowViewModel : ObservableObject
 
             SelectedLayer = Layers[levelEntity.DefaultLayer];
             DefaultLayer = Layers[levelEntity.DefaultLayer];
+
+            WindowTitle = $"TileEditor - {LevelProperties.Name}";
 
             WeakReferenceMessenger.Default.Send(new LevelLoadedMessage(tileFilenames));
         }
