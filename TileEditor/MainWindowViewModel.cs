@@ -66,15 +66,17 @@ public partial class MainWindowViewModel : ObservableObject
     private Layer? _defaultLayer;
 
     [ObservableProperty]
-    private LevelProperties _levelProperties = new();
+    [NotifyPropertyChangedFor(nameof(CanSave))]
+    private LevelProperties? _levelProperties;
+
+    public bool CanSave
+    {
+        get => LevelProperties != null;
+    }
 
     public MainWindowViewModel()
     {
-        // Add one default empty layer on init
-        AddLayer();
-        SelectedLayer = Layers[0];
-        DefaultLayer = Layers[0];
-
+        SetDefaults();
         WeakReferenceMessenger.Default.Register<TileSelectedChangeMessage>(this, (r, m) => ReceiveSelectedTile(m));
         WeakReferenceMessenger.Default.Register<EntitySelectedChange>(this, (r, m) => ReceiveSelectedGameObject(m));
         WeakReferenceMessenger.Default.Register<LayerResizeMessage>(this, (r, m) => ReceiveLayerResizeMessage(m));
@@ -252,7 +254,7 @@ public partial class MainWindowViewModel : ObservableObject
         var level = new LevelEntity
         {
             GameObjects = gameObjects!,
-            Background = LevelProperties.BackgroundPath,
+            Background = LevelProperties!.BackgroundPath, // Save is disabled when level props is null so no null deference here
             Music = LevelProperties.MusicPath,
             NextLevel = LevelProperties.NextLevel,
             Layers = [.. layers],
@@ -269,12 +271,14 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void OnEdit()
     {
+        LevelProperties = new LevelProperties();
         var _editLevelPropertiesWindow = new EditLevelPropertiesWindow();
         _editLevelPropertiesWindow.ShowDialog();
+        WindowTitle = $"TileEditor - {LevelProperties.Name}";
     }
 
     [RelayCommand]
-    private void NotImplemented()
+    private static void NotImplemented()
     {
         new EditorMessageBox("Not implemented", "Error", Buttons.OK).ShowDialog();
     }
@@ -291,7 +295,7 @@ public partial class MainWindowViewModel : ObservableObject
         if (dialog.ShowDialog() == true)
         {
             var relativePath = Path.GetRelativePath(GamePath, dialog.FileName).Replace("\\", "/");
-            LevelProperties.BackgroundPath = relativePath;
+            LevelProperties!.BackgroundPath = relativePath; // Level props is initialized when the edit window is opened so no null dereference here
         }
     }
 
@@ -307,7 +311,7 @@ public partial class MainWindowViewModel : ObservableObject
         if (dialog.ShowDialog() == true)
         {
             var relativePath = Path.GetRelativePath(GamePath, dialog.FileName).Replace("\\", "/");
-            LevelProperties.MusicPath = relativePath;
+            LevelProperties!.MusicPath = relativePath; // Level props is initialized when the edit window is opened so no null dereference here
         }
     }
 
@@ -323,7 +327,7 @@ public partial class MainWindowViewModel : ObservableObject
         if (dialog.ShowDialog() == true)
         {
             var relativePath = Path.GetRelativePath(GamePath, dialog.FileName).Replace("\\", "/");
-            LevelProperties.NextLevel = relativePath;
+            LevelProperties!.NextLevel = relativePath; // Level props is initialized when the edit window is opened so no null dereference here
         }
     }
 
@@ -478,6 +482,17 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void NewLevel()
+    {
+        SetDefaults();
+        var props = new LevelProperties();
+        LevelProperties = props;
+        new EditLevelPropertiesWindow().ShowDialog();
+        AddLayer();
+        WindowTitle = $"TileEditor - {LevelProperties.Name}";
+    }
+
+    [RelayCommand]
     private async Task OpenLevel()
     {
         var dialog = new OpenFileDialog()
@@ -585,9 +600,25 @@ public partial class MainWindowViewModel : ObservableObject
             catch (Exception ex)
             {
                 new EditorMessageBox(ex.Message, "Error", Buttons.OK).ShowDialog();
-                // TODO: reinit everything to zero
+                SetDefaults();
             }
         }
+
+    }
+
+    private void SetDefaults()
+    {
+        WindowTitle = "TileEditor";
+        GamePath = "D:\\Dev\\webgl-engine";
+        TabIndex = 0;
+        LayerWidth = 32;
+        LayerHeight = 18;
+        SelectedTile = null;
+        SelectedLayer = null;
+        SelectedGameObject = null;
+        Layers = [];
+        LevelProperties = null;
+        WeakReferenceMessenger.Default.Send(new LevelLoadedMessage([]));
     }
 
     public class LevelLoadedMessage(HashSet<string> value) : ValueChangedMessage<HashSet<string>>(value) { }
