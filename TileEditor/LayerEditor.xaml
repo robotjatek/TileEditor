@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TileEditor"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib" 
              d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -24,7 +25,6 @@
                                    Text="{Binding GameObject.Type}" />
                     </Border>
                 </StackPanel>
-
             </DataTemplate>
 
             <DataTemplate x:Key="Normal">
@@ -32,7 +32,8 @@
                     <Grid>
                         <Image Width="64" Height="64">
                             <Image.Source>
-                                <Binding Path="TexturePath"></Binding> <!-- TODO: itt most databind error van. EmptyTile típust visszahozni? -->
+                                <Binding Path="TexturePath"></Binding>
+                                <!-- TODO: itt most databind error van. EmptyTile típust visszahozni? -->
                             </Image.Source>
                         </Image>
                         <TextBlock Foreground="White" 
@@ -45,24 +46,89 @@
             </DataTemplate>
 
             <local:TileSelector x:Key="tileSelector" EmptyTile="{StaticResource Empty}" NormalTile="{StaticResource Normal}" />
+
+            <ObjectDataProvider x:Key="EnumDataSource"
+                        ObjectType="{x:Type sys:Enum}"
+                        MethodName="GetValues">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:Tool" />
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
 
 
-    <ScrollViewer
-        HorizontalScrollBarVisibility="Visible"
-        VerticalScrollBarVisibility="Visible"
-        
-        
-        PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
-        MouseDown="ScrollViewer_MouseDown"
-        MouseUp="ScrollViewer_MouseUp"
-        MouseMove="ScrollViewer_MouseMove">
-        <StackPanel VerticalAlignment="Center" Margin="10">
-            <ItemsControl x:Name="itemsControl" ItemsSource="{Binding DataContext.SelectedLayer.Tiles, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" ItemTemplateSelector="{StaticResource tileSelector}">
-                <ItemsControl.ItemsPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <!--<Button Command="{Binding SelectToolCommand}"
+                    CommandParameter="{x:Static local:Tool.SINGLE}" 
+                    Width="36"
+                    ToolTip="Single">[ ]</Button>
+
+            <Button Command="{Binding SelectToolCommand}"
+                    CommandParameter="{x:Static local:Tool.ROW}" 
+                    Width="36"
+                    ToolTip="Fill row">[ ]</Button>
+
+            <Button Command="{Binding SelectToolCommand}"
+                    CommandParameter="{x:Static local:Tool.COLUMN}"
+                    Width="36"
+                    ToolTip="Fill column">[ ]</Button>
+
+            <Button Command="{Binding SelectToolCommand}"
+                    CommandParameter="{x:Static local:Tool.SQUARE}"
+                    Width="36" 
+                    ToolTip="Square">[ ]</Button>
+
+            <Button Command="{Binding SelectToolCommand}"
+                    CommandParameter="{x:Static local:Tool.GRAB}"
+                    Width="36"
+                    ToolTip="Grab layer tool">[ ]</Button>
+
+            <Button Command="{Binding NotImplementedCommand}" Width="36" ToolTip="Align bottom">[ ]</Button>-->
+
+            <ListBox SelectedItem="{Binding Tool}" BorderThickness="0" ItemsSource="{Binding Source={StaticResource EnumDataSource}}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel VerticalAlignment="Center">
+                            <Border Width="36" Height="36" BorderBrush="White" BorderThickness="1">
+                                <Grid Background="Transparent" ToolTip="{TemplateBinding Content}"></Grid>
+                                <!--<ContentPresenter Content="{TemplateBinding Content}" />-->
+                            </Border>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+
+                <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid 
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+        </StackPanel>
+
+        <Separator Grid.Row="1" />
+
+        <ScrollViewer Grid.Row="2"
+            HorizontalScrollBarVisibility="Visible"
+            VerticalScrollBarVisibility="Visible"
+            PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
+            MouseDown="ScrollViewer_MouseDown"
+            MouseUp="ScrollViewer_MouseUp"
+            MouseMove="ScrollViewer_MouseMove">
+
+
+            <StackPanel VerticalAlignment="Center" Margin="10">
+                <ItemsControl x:Name="itemsControl" ItemsSource="{Binding DataContext.SelectedLayer.Tiles, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" ItemTemplateSelector="{StaticResource tileSelector}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid 
                                 x:Name="uniformGrid"
                                 HorizontalAlignment="Center"
                                 Columns="{Binding SelectedLayer.Width}"
@@ -70,10 +136,11 @@
                                 MouseMove="UniformGrid_MouseMove"
                                 MouseUp="UniformGrid_MouseUp"
                                 MouseDown="UniformGrid_MouseDown">
-                        </UniformGrid>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-        </StackPanel>
-    </ScrollViewer>
+                            </UniformGrid>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
 </UserControl>

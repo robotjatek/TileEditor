@@ -8,19 +8,6 @@ using System.Windows.Controls;
 
 namespace TileEditor;
 
-class IntValidator(int minValue, int maxValue, string errorMessage) : ValidationRule
-{
-    public override ValidationResult Validate(object value, CultureInfo cultureInfo)
-    {
-        if (int.TryParse(value as string, out var parsed) && parsed >= minValue && parsed <= maxValue)
-        {
-            return ValidationResult.ValidResult;
-        }
-
-        return new ValidationResult(false, errorMessage);
-    }
-}
-
 // 32 & 18 are based on the Environment.ts in the engine.
 // This is not a hard constraint of the engine, but the screen is in these dimensions. So it makes sense to have a default value like this in the editor
 class LayerWidthValidationRule : IntValidator

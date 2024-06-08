@@ -31,6 +31,7 @@
                             <ColumnDefinition Width="8*" />
                             <ColumnDefinition Width="auto" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
                         <Border Grid.Column="0" Height="64" BorderBrush="White" BorderThickness="1">
@@ -61,6 +62,16 @@
                                     CommandParameter="{Binding .}"
                                     />
                         </Grid>
+                        <Grid Grid.Column="3" Margin ="2">
+                            <Button
+                                FontFamily="Segoe UI Symbol"
+                                Content="&#xE115;"
+                                Height="30"
+                                Command="{Binding ElementName=lb, Path=DataContext.EditLayerPropertiesCommand}"
+                                CommandParameter="{Binding .}">
+                            </Button>
+                        </Grid>
+
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

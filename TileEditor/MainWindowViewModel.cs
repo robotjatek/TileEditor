@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Messaging.Messages;
 using Microsoft.Win32;
 
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Text.Json;
 
@@ -15,6 +16,16 @@ using TileEditor.DTOs;
 using static TileEditor.ResizeLayerWindowViewModel;
 
 namespace TileEditor;
+
+public enum Tool
+{
+    [Description("Single placement")] // TODO: description megjelenítéséhez value converter kell
+    SINGLE,
+    ROW,
+    COLUMN,
+    SQUARE,
+    GRAB
+}
 
 public partial class LevelProperties : ObservableObject
 {
@@ -34,6 +45,9 @@ public partial class LevelProperties : ObservableObject
 public partial class MainWindowViewModel : ObservableObject
 {
     private static readonly JsonSerializerOptions serializeOptions = new() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+    [ObservableProperty]
+    private Tool _tool = Tool.SINGLE;
 
     [ObservableProperty]
     private string _windowTitle = "TileEditor";
@@ -122,7 +136,24 @@ public partial class MainWindowViewModel : ObservableObject
         {
             if (SelectedTile != null)
             {
-                SelectedLayer.Tiles[y * LayerWidth + x] = SelectedTile.Clone();
+                if (Tool == Tool.SINGLE)
+                {
+                    SelectedLayer.Tiles[y * LayerWidth + x] = SelectedTile.Clone();
+                }
+                else if (Tool == Tool.ROW)
+                {
+                    for (int i = 0; i < LayerWidth; i++)
+                    {
+                        SelectedLayer.Tiles[y * LayerWidth + i] = SelectedTile.Clone();
+                    }
+                }
+                else if (Tool == Tool.COLUMN)
+                {
+                    for (int i = 0; i < LayerHeight; i++)
+                    {
+                        SelectedLayer.Tiles[i * LayerWidth + x] = SelectedTile.Clone();
+                    }
+                }
             }
         }
         else if (TabIndex == 1) // game object mode
@@ -182,7 +213,9 @@ public partial class MainWindowViewModel : ObservableObject
 
             layers.Add(new LayerEntity
             {
-                Tiles = tiles!
+                Tiles = tiles!,
+                ParallaxOffsetFactorX = item.ParallaxOffsetFactorX,
+                ParallaxOffsetFactorY = item.ParallaxOffsetFactorY,
             });
         }
 
@@ -271,7 +304,8 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void OnEdit()
     {
-        LevelProperties = new LevelProperties();
+        LevelProperties ??= new LevelProperties();
+
         var _editLevelPropertiesWindow = new EditLevelPropertiesWindow();
         _editLevelPropertiesWindow.ShowDialog();
         WindowTitle = $"TileEditor - {LevelProperties.Name}";
@@ -553,6 +587,8 @@ public partial class MainWindowViewModel : ObservableObject
                         Tiles = [.. tiles],
                         Height = layerHeight,
                         Width = layerWidth,
+                        ParallaxOffsetFactorX = layerEntity.ParallaxOffsetFactorX,
+                        ParallaxOffsetFactorY = layerEntity.ParallaxOffsetFactorY,                        
                     };
 
                     return currentLayer;
@@ -604,6 +640,18 @@ public partial class MainWindowViewModel : ObservableObject
             }
         }
 
+    }
+
+    [RelayCommand]
+    private static void EditLayerProperties(Layer layer)
+    {
+        var wm = new LayerPropertiesWindowViewModel(layer);
+        var window = new LayerPropertiesWindow
+        {
+            DataContext = wm
+        };
+        wm.OnRequestClose += (_, _) => window.Close();
+        window.ShowDialog();
     }
 
     private void SetDefaults()

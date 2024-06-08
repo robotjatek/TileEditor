@@ -20,6 +20,12 @@ public partial class Layer : ObservableObject
     [ObservableProperty]
     private bool _isDefault = false;
 
+    [ObservableProperty]
+    private double _parallaxOffsetFactorX = 0.05;
+
+    [ObservableProperty]
+    private double _parallaxOffsetFactorY = 0.1;
+
     public Tile? GetTile(int x, int y)
     {
         var index = y * Width + x;
