@@ -37,6 +37,8 @@ public class LayerEntity
     public TileEntity[] Tiles { get; set; } = [];
     public double ParallaxOffsetFactorX { get; set; }
     public double ParallaxOffsetFactorY { get; set; }
+    public double LayerOffsetX { get; set; }
+    public double LayerOffsetY { get; set; }
 }
 
 public class LevelEntity

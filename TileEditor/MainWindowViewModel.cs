@@ -216,6 +216,8 @@ public partial class MainWindowViewModel : ObservableObject
                 Tiles = tiles!,
                 ParallaxOffsetFactorX = item.ParallaxOffsetFactorX,
                 ParallaxOffsetFactorY = item.ParallaxOffsetFactorY,
+                LayerOffsetX = item.LayerOffsetX,
+                LayerOffsetY = item.LayerOffsetY,
             });
         }
 
@@ -588,7 +590,9 @@ public partial class MainWindowViewModel : ObservableObject
                         Height = layerHeight,
                         Width = layerWidth,
                         ParallaxOffsetFactorX = layerEntity.ParallaxOffsetFactorX,
-                        ParallaxOffsetFactorY = layerEntity.ParallaxOffsetFactorY,                        
+                        ParallaxOffsetFactorY = layerEntity.ParallaxOffsetFactorY,
+                        LayerOffsetX = layerEntity.LayerOffsetX,
+                        LayerOffsetY = layerEntity.LayerOffsetY
                     };
 
                     return currentLayer;

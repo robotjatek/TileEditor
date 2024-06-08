@@ -98,11 +98,6 @@
                         </Trigger>
                     </Style.Triggers>
                 </Style>
-
-                <!--<Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                    <Setter Property="Height" Value="32" />
-                    <Setter Property="Margin" Value="0, 0, 4, 0" />
-                </Style>-->
             </Style.Resources>
         </Style>
     </Window.Resources>
@@ -124,10 +119,12 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0">X Parallax Offset</Label>
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbOffsetX">
+                <Label Grid.Row="0" Grid.Column="0">X Parallax factor</Label>
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbOffsetXFactor">
                     <TextBox.Text>
                         <Binding Path="ParallaxOffsetX" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
@@ -137,10 +134,32 @@
                     </TextBox.Text>
                 </TextBox>
 
-                <Label Grid.Row="1" Grid.Column="0">Y Parallax Offset</Label>
-                <TextBox Grid.Row="1" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbOffsetY">
+                <Label Grid.Row="1" Grid.Column="0">Y Parallax factor</Label>
+                <TextBox Grid.Row="1" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbOffsetYFactor">
                     <TextBox.Text>
                         <Binding Path="ParallaxOffsetY" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <local:DoubleValidator />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+
+                <Label Grid.Row="2" Grid.Column="0">X layer offset</Label>
+                <TextBox Grid.Row="2" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbLayerOffsetX">
+                    <TextBox.Text>
+                        <Binding Path="LayerOffsetX" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <local:DoubleValidator />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+
+                <Label Grid.Row="3" Grid.Column="0">Y layer offset</Label>
+                <TextBox Grid.Row="3" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbLayerOffsetY">
+                    <TextBox.Text>
+                        <Binding Path="LayerOffsetY" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <local:DoubleValidator />
                             </Binding.ValidationRules>
@@ -162,10 +181,18 @@
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=tbOffsetX, Path=(Validation.HasError)}" Value="True">
+                                    <DataTrigger Binding="{Binding ElementName=tbOffsetXFactor, Path=(Validation.HasError)}" Value="True">
                                         <Setter Property="IsEnabled" Value="False" />
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding ElementName=tbOffsetY, Path=(Validation.HasError)}" Value="True">
+                                    <DataTrigger Binding="{Binding ElementName=tbOffsetYFactor, Path=(Validation.HasError)}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding ElementName=tbLayerOffsetX, Path=(Validation.HasError)}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding ElementName=tbLayerOffsetY, Path=(Validation.HasError)}" Value="True">
                                         <Setter Property="IsEnabled" Value="False" />
                                     </DataTrigger>
                                 </Style.Triggers>

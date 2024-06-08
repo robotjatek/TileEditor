@@ -2,9 +2,7 @@
 
 using System.Collections.ObjectModel;
 
-using TileEditor.Domain;
-
-namespace TileEditor;
+namespace TileEditor.Domain;
 
 public partial class Layer : ObservableObject
 {
@@ -25,6 +23,12 @@ public partial class Layer : ObservableObject
 
     [ObservableProperty]
     private double _parallaxOffsetFactorY = 0.1;
+
+    [ObservableProperty]
+    private double _layerOffsetX = 0;
+
+    [ObservableProperty]
+    private double _layerOffsetY = 0;
 
     public Tile? GetTile(int x, int y)
     {
