@@ -46,14 +46,6 @@
             </DataTemplate>
 
             <local:TileSelector x:Key="tileSelector" EmptyTile="{StaticResource Empty}" NormalTile="{StaticResource Normal}" />
-
-            <ObjectDataProvider x:Key="EnumDataSource"
-                        ObjectType="{x:Type sys:Enum}"
-                        MethodName="GetValues">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="local:Tool" />
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -66,40 +58,15 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <!--<Button Command="{Binding SelectToolCommand}"
-                    CommandParameter="{x:Static local:Tool.SINGLE}" 
-                    Width="36"
-                    ToolTip="Single">[ ]</Button>
-
-            <Button Command="{Binding SelectToolCommand}"
-                    CommandParameter="{x:Static local:Tool.ROW}" 
-                    Width="36"
-                    ToolTip="Fill row">[ ]</Button>
-
-            <Button Command="{Binding SelectToolCommand}"
-                    CommandParameter="{x:Static local:Tool.COLUMN}"
-                    Width="36"
-                    ToolTip="Fill column">[ ]</Button>
-
-            <Button Command="{Binding SelectToolCommand}"
-                    CommandParameter="{x:Static local:Tool.SQUARE}"
-                    Width="36" 
-                    ToolTip="Square">[ ]</Button>
-
-            <Button Command="{Binding SelectToolCommand}"
-                    CommandParameter="{x:Static local:Tool.GRAB}"
-                    Width="36"
-                    ToolTip="Grab layer tool">[ ]</Button>
-
-            <Button Command="{Binding NotImplementedCommand}" Width="36" ToolTip="Align bottom">[ ]</Button>-->
-
-            <ListBox SelectedItem="{Binding Tool}" BorderThickness="0" ItemsSource="{Binding Source={StaticResource EnumDataSource}}">
+            <ListBox SelectedItem="{Binding Tool}" BorderThickness="0" ItemsSource="{Binding Tools}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel VerticalAlignment="Center">
-                            <Border Width="36" Height="36" BorderBrush="White" BorderThickness="1">
-                                <Grid Background="Transparent" ToolTip="{TemplateBinding Content}"></Grid>
-                                <!--<ContentPresenter Content="{TemplateBinding Content}" />-->
+                            <Border Background="Transparent" ToolTip="{Binding Tooltip}" Width="36" Height="36" BorderBrush="White" BorderThickness="1">
+                                <Grid VerticalAlignment="Center" 
+                                      HorizontalAlignment="Center">
+                                    <TextBlock FontSize="20" FontFamily="Segoe UI Symbol" Text="{Binding Content}" />
+                                </Grid>
                             </Border>
                         </StackPanel>
                     </DataTemplate>

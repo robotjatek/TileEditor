@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:TileEditor" xmlns:shell="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:LayerPropertiesWindowViewModel}"
+        WindowStartupLocation="CenterScreen"
         Title="Layer Properties">
 
     <WindowChrome.WindowChrome>

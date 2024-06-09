@@ -6,7 +6,6 @@ using CommunityToolkit.Mvvm.Messaging.Messages;
 using Microsoft.Win32;
 
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Text.Json;
 
@@ -17,14 +16,35 @@ using static TileEditor.ResizeLayerWindowViewModel;
 
 namespace TileEditor;
 
-public enum Tool
+public class DrawTool
 {
-    [Description("Single placement")] // TODO: description megjelenítéséhez value converter kell
-    SINGLE,
-    ROW,
-    COLUMN,
-    SQUARE,
-    GRAB
+    public required string Tooltip { get; init; }
+
+    public required string Content { get; init; }
+
+    public static readonly DrawTool SINGLE = new()
+    {
+        Content = "\ue20d",
+        Tooltip = "Single placement"
+    };
+
+    public static readonly DrawTool ROW = new()
+    {
+        Content = "\uE147",
+        Tooltip = "Row placement"
+    };
+
+    public static readonly DrawTool COLUMN = new()
+    {
+        Content = "\uE145",
+        Tooltip = "Column placement"
+    };
+
+    public static readonly DrawTool SQUARE = new()
+    {
+        Content = "\uE138",
+        Tooltip = "Square placement"
+    };
 }
 
 public partial class LevelProperties : ObservableObject
@@ -47,7 +67,16 @@ public partial class MainWindowViewModel : ObservableObject
     private static readonly JsonSerializerOptions serializeOptions = new() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     [ObservableProperty]
-    private Tool _tool = Tool.SINGLE;
+    private DrawTool[] _tools =
+    [
+        DrawTool.SINGLE,
+        DrawTool.ROW,
+        DrawTool.COLUMN,
+        DrawTool.SQUARE,
+    ];
+
+    [ObservableProperty]
+    private DrawTool _tool = DrawTool.SINGLE;
 
     [ObservableProperty]
     private string _windowTitle = "TileEditor";
@@ -136,18 +165,18 @@ public partial class MainWindowViewModel : ObservableObject
         {
             if (SelectedTile != null)
             {
-                if (Tool == Tool.SINGLE)
+                if (Tool == DrawTool.SINGLE)
                 {
                     SelectedLayer.Tiles[y * LayerWidth + x] = SelectedTile.Clone();
                 }
-                else if (Tool == Tool.ROW)
+                else if (Tool == DrawTool.ROW)
                 {
                     for (int i = 0; i < LayerWidth; i++)
                     {
                         SelectedLayer.Tiles[y * LayerWidth + i] = SelectedTile.Clone();
                     }
                 }
-                else if (Tool == Tool.COLUMN)
+                else if (Tool == DrawTool.COLUMN)
                 {
                     for (int i = 0; i < LayerHeight; i++)
                     {
