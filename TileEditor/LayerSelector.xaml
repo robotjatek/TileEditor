@@ -22,7 +22,7 @@
         <ListBox Grid.Row="0" ItemsSource="{Binding Layers}" 
              SelectedItem="{Binding SelectedLayer}"
              HorizontalContentAlignment="Stretch"
-                 Name="lb">
+                 Name="listBox">
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -50,7 +50,7 @@
                                     VerticalAlignment="Stretch"
                                     FontFamily="Segoe UI Symbol"
                                     Content="&#xE110;"
-                                    Command="{Binding ElementName=lb, Path=DataContext.MoveLayerUpCommand }"
+                                    Command="{Binding ElementName=listBox, Path=DataContext.MoveLayerUpCommand }"
                                     CommandParameter="{Binding .}"
                                     />
 
@@ -58,7 +58,7 @@
                                     VerticalAlignment="Stretch"
                                     FontFamily="Segoe UI Symbol"
                                     Content="&#xE1FD;" 
-                                    Command="{Binding ElementName=lb, Path=DataContext.MoveLayerDownCommand }"
+                                    Command="{Binding ElementName=listBox, Path=DataContext.MoveLayerDownCommand }"
                                     CommandParameter="{Binding .}"
                                     />
                         </Grid>
@@ -67,7 +67,7 @@
                                 FontFamily="Segoe UI Symbol"
                                 Content="&#xE115;"
                                 Height="30"
-                                Command="{Binding ElementName=lb, Path=DataContext.EditLayerPropertiesCommand}"
+                                Command="{ Binding ElementName=listBox, Path=DataContext.EditLayerPropertiesCommand }"
                                 CommandParameter="{Binding .}">
                             </Button>
                         </Grid>

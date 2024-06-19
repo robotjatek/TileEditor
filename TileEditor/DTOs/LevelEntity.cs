@@ -41,6 +41,13 @@ public class LayerEntity
     public double LayerOffsetY { get; set; }
 }
 
+public class EventEntity
+{
+    public string Type { get; set; }
+    
+    public Dictionary<string, object> Props { get; set; } = [];
+}
+
 public class LevelEntity
 {
     public string Background { get; set; }
@@ -58,4 +65,6 @@ public class LevelEntity
     public StartEntity? Start { get; set; }
 
     public string NextLevel { get; set; }
+
+    public EventEntity[] Events { get; set; } = [];
 }

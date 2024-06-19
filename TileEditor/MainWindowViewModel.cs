@@ -11,6 +11,7 @@ using System.Text.Json;
 
 using TileEditor.Domain;
 using TileEditor.DTOs;
+using TileEditor.EventSelectorWindow;
 
 using static TileEditor.ResizeLayerWindowViewModel;
 
@@ -64,6 +65,37 @@ public partial class LevelProperties : ObservableObject
 
 public partial class MainWindowViewModel : ObservableObject
 {
+    [ObservableProperty]
+    private ObservableCollection<LevelEvent> _levelEvents = [];
+
+    [ObservableProperty]
+    private LevelEvent? _selectedLevelEvent;
+
+    [RelayCommand]
+    private void RemoveEvent(LevelEvent @event)
+    {
+        var result = new EditorMessageBox("Are you sure?", "Removing event", Buttons.OK_CANCEL).ShowDialog();
+        if (result == CustomDialogResult.OK)
+        {
+            _levelEvents.Remove(@event);
+        }
+    }
+
+    [RelayCommand]
+    private void OpenEventEditorWindow(LevelEvent @event)
+    {
+        // TODO: create window
+    }
+
+    [RelayCommand]
+    private void OpenEventSelectorWindow(LevelEvent @event)
+    {
+        var wm = new EventSelectorWindowViewModel();
+        var wnd = new EventSelectorWindow.EventSelectorWindow(wm);
+        wm.OnRequestClose += (_, _) => wnd.Close();
+        wnd.Show();
+    }
+
     private static readonly JsonSerializerOptions serializeOptions = new() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     [ObservableProperty]
@@ -114,7 +146,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     public bool CanSave
     {
-        get => LevelProperties != null;
+        get => LevelProperties is not null;
     }
 
     public MainWindowViewModel()
@@ -123,6 +155,15 @@ public partial class MainWindowViewModel : ObservableObject
         WeakReferenceMessenger.Default.Register<TileSelectedChangeMessage>(this, (r, m) => ReceiveSelectedTile(m));
         WeakReferenceMessenger.Default.Register<EntitySelectedChange>(this, (r, m) => ReceiveSelectedGameObject(m));
         WeakReferenceMessenger.Default.Register<LayerResizeMessage>(this, (r, m) => ReceiveLayerResizeMessage(m));
+        WeakReferenceMessenger.Default.Register<EventSelectedMessage>(this, (r, m) => ReceiveSelectedEvent(m));
+    }
+
+    private void ReceiveSelectedEvent(ValueChangedMessage<LevelEvent> message)
+    {
+        if (!LevelEvents.Contains(message.Value))
+        {
+            LevelEvents.Add(message.Value);
+        }
     }
 
     private void ReceiveSelectedTile(ValueChangedMessage<Tile> message)
@@ -315,6 +356,12 @@ public partial class MainWindowViewModel : ObservableObject
                 return;
         }
 
+        var events = LevelEvents.Select(e => new EventEntity
+        {
+            Type = e.Type,
+            Props = e.Props
+        });
+
         var level = new LevelEntity
         {
             GameObjects = gameObjects!,
@@ -324,7 +371,8 @@ public partial class MainWindowViewModel : ObservableObject
             Layers = [.. layers],
             LevelEnd = levelEnd,
             Start = start,
-            DefaultLayer = Layers.IndexOf(DefaultLayer)
+            DefaultLayer = Layers.IndexOf(DefaultLayer),
+            Events = [.. events]
         };
 
         var levelName = LevelProperties.Name;
@@ -662,6 +710,13 @@ public partial class MainWindowViewModel : ObservableObject
                 SelectedLayer = Layers[levelEntity.DefaultLayer];
                 DefaultLayer = Layers[levelEntity.DefaultLayer];
 
+                var events = levelEntity.Events.Select(e => new LevelEvent
+                {
+                    Type = e.Type,
+                    Props = e.Props
+                });
+                LevelEvents = [.. events];
+
                 WindowTitle = $"TileEditor - {LevelProperties.Name}";
 
                 WeakReferenceMessenger.Default.Send(new LevelLoadedMessage(tileFilenames));
@@ -699,6 +754,7 @@ public partial class MainWindowViewModel : ObservableObject
         SelectedGameObject = null;
         Layers = [];
         LevelProperties = null;
+        LevelEvents = [];
         WeakReferenceMessenger.Default.Send(new LevelLoadedMessage([]));
     }
 

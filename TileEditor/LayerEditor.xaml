@@ -22,6 +22,7 @@
                                    FontSize="16"
                                    VerticalAlignment="Center" 
                                    TextAlignment="Center"
+                                   TextWrapping="Wrap"
                                    Text="{Binding GameObject.Type}" />
                     </Border>
                 </StackPanel>
@@ -40,6 +41,7 @@
                                    FontSize="16"
                                    VerticalAlignment="Center" 
                                    TextAlignment="Center"
+                                   TextWrapping="Wrap"
                                    Text="{Binding GameObject.Type}" />
                     </Grid>
                 </Border>
@@ -62,7 +64,7 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel VerticalAlignment="Center">
-                            <Border Background="Transparent" ToolTip="{Binding Tooltip}" Width="36" Height="36" BorderBrush="White" BorderThickness="1">
+                            <Border Background="Transparent" ToolTipService.InitialShowDelay="10" ToolTip="{Binding Tooltip}" Width="36" Height="36" BorderBrush="White" BorderThickness="1">
                                 <Grid VerticalAlignment="Center" 
                                       HorizontalAlignment="Center">
                                     <TextBlock FontSize="20" FontFamily="Segoe UI Symbol" Text="{Binding Content}" />
