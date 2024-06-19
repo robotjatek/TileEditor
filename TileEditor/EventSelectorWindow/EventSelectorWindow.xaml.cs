@@ -7,11 +7,11 @@ namespace TileEditor.EventSelectorWindow;
 /// </summary>
 public partial class EventSelectorWindow : Window
 {
-    public EventSelectorWindow(EventSelectorWindowViewModel wm)
+    public EventSelectorWindow(EventSelectorWindowViewModel vm)
     {
         InitializeComponent();
         this.Owner = App.Current.MainWindow;
-        DataContext = wm;
+        DataContext = vm;
     }
 
     private void Close_Click(object sender, RoutedEventArgs e)

@@ -11,6 +11,7 @@ using System.Text.Json;
 
 using TileEditor.Domain;
 using TileEditor.DTOs;
+using TileEditor.EventEditorWindow;
 using TileEditor.EventSelectorWindow;
 
 using static TileEditor.ResizeLayerWindowViewModel;
@@ -84,15 +85,18 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void OpenEventEditorWindow(LevelEvent @event)
     {
-        // TODO: create window
+        var vm = new EventEditorViewModel(@event);
+        var wnd = new EventEditorWindow.EventEditorWindow(vm);
+        vm.OnRequestClose += (_, _) => wnd.Close();
+        wnd.Show();
     }
 
     [RelayCommand]
     private void OpenEventSelectorWindow(LevelEvent @event)
     {
-        var wm = new EventSelectorWindowViewModel();
-        var wnd = new EventSelectorWindow.EventSelectorWindow(wm);
-        wm.OnRequestClose += (_, _) => wnd.Close();
+        var vm = new EventSelectorWindowViewModel();
+        var wnd = new EventSelectorWindow.EventSelectorWindow(vm);
+        vm.OnRequestClose += (_, _) => wnd.Close();
         wnd.Show();
     }
 

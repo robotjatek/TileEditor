@@ -23,7 +23,7 @@
              SelectedItem="{Binding SelectedLayer}"
              HorizontalContentAlignment="Stretch"
                  Name="listBox">
-
+            
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid Height="64">

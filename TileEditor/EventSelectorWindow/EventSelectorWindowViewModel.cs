@@ -7,26 +7,29 @@ using TileEditor.Domain;
 
 namespace TileEditor.EventSelectorWindow;
 
-public class EventSelectedMessage(LevelEvent value) : ValueChangedMessage<LevelEvent>(value) {}
+public class EventSelectedMessage(LevelEvent value) : ValueChangedMessage<LevelEvent>(value) { }
 
 public partial class EventSelectorWindowViewModel : ObservableObject
 {
     // TODO: edit window
     // TODO: editor functionality for events
-    
+
     private static readonly LevelEvent[] events = [
-         new LevelEvent
-            {
-                Type = "escape_event",
-                Props = new Dictionary<string, object> // these are default values
-                {
-                    { "eventLayerId", 2 },
-                    { "eventLayerStopPosition", 6 },
-                    { "cameraStopPosition", 4 },
-                    { "eventLayerSpeed", 0.0022 },
-                    { "cameraSpeed", 0.002 }
-                }
-            }];
+        new EscapeEvent(2, 6, 4, 0.0022, 0.002),
+
+        //new LevelEvent
+        //{
+        //    Type = "escape_event",
+        //    Props = new Dictionary<string, object> // these are default values
+        //    {
+        //        { "eventLayerId", 2 },
+        //        { "eventLayerStopPosition", 6 },
+        //        { "cameraStopPosition", 4 },
+        //        { "eventLayerSpeed", 0.0022 },
+        //        { "cameraSpeed", 0.002 }
+        //    }
+        //}
+        ];
 
     public event EventHandler? OnRequestClose;
 

@@ -1,21 +1,19 @@
-﻿<Window x:Class="TileEditor.EventSelectorWindow.EventSelectorWindow"
+﻿<Window x:Class="TileEditor.EventEditorWindow.EventEditorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TileEditor.EventSelectorWindow"
+        xmlns:local="clr-namespace:TileEditor.EventEditorWindow" xmlns:shell="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
         mc:Ignorable="d"
-        xmlns:shell="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
-        d:DataContext="{d:DesignInstance Type=local:EventSelectorWindowViewModel}"
-        WindowStartupLocation="CenterOwner"
-        Title="Add event..." Width="400">
+        d:DataContext="{d:DesignInstance Type=local:EventEditorViewModel}"
+        Title="{Binding ToEdit.Type}" Height="450" Width="800">
 
     <WindowChrome.WindowChrome>
         <shell:WindowChrome CaptionHeight="36" GlassFrameThickness="0" CornerRadius="0" ResizeBorderThickness="5"/>
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
-        <Style TargetType="local:EventSelectorWindow">
+        <Style TargetType="local:EventEditorWindow">
             <Setter Property="Background" Value="#303040" />
             <Setter Property="SizeToContent" Value="Height" />
             <Setter Property="ResizeMode" Value="NoResize" />
@@ -29,7 +27,7 @@
 
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="local:EventSelectorWindow">
+                    <ControlTemplate TargetType="local:EventEditorWindow">
                         <Grid Background="#303040">
 
                             <Grid.RowDefinitions>
@@ -92,22 +90,28 @@
         </Style>
     </Window.Resources>
 
-    <Grid Background="#303040">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition />
+            <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="50" />
         </Grid.RowDefinitions>
 
-        <ListBox HorizontalContentAlignment="Stretch" Margin="5" Grid.Row="0" ItemsSource="{Binding AvailableEvents}" SelectedItem="{Binding SelectedEvent}">
-            <ListBox.ItemTemplate>
+        <ItemsControl Padding="5" Grid.Row="0" ItemsSource="{Binding Ps}">
+            <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Height="64" Margin="1" Padding="2" BorderThickness="1" BorderBrush="White">
-                        <TextBlock Text="{Binding Type}" />
-                    </Border>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        
+                        <Label Grid.Column="0" Content="{Binding Key}" />
+                        <TextBox Grid.Column="1" Text="{Binding Value}" />
+                    </Grid>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
         <Separator Grid.Row="1" />
 
@@ -116,14 +120,8 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Button
-                Grid.Column="0"
-                Command="{Binding OkClickedCommand}"
-                    IsEnabled="{Binding CanAccept}">OK</Button>
-
-            <Button 
-                Grid.Column="1"
-                Command="{Binding CancelClickedCommand}">Cancel</Button>
+            <Button Command="{Binding OkClickedCommand}" Grid.Column="0">OK</Button>
+            <Button Command="{Binding CancelClickedCommand}" Grid.Column="1">Cancel</Button>
         </Grid>
     </Grid>
 </Window>
