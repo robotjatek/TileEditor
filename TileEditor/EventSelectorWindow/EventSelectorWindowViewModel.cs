@@ -11,25 +11,7 @@ public class EventSelectedMessage(LevelEvent value) : ValueChangedMessage<LevelE
 
 public partial class EventSelectorWindowViewModel : ObservableObject
 {
-    // TODO: edit window
-    // TODO: editor functionality for events
-
-    private static readonly LevelEvent[] events = [
-        new EscapeEvent(2, 6, 4, 0.0022, 0.002),
-
-        //new LevelEvent
-        //{
-        //    Type = "escape_event",
-        //    Props = new Dictionary<string, object> // these are default values
-        //    {
-        //        { "eventLayerId", 2 },
-        //        { "eventLayerStopPosition", 6 },
-        //        { "cameraStopPosition", 4 },
-        //        { "eventLayerSpeed", 0.0022 },
-        //        { "cameraSpeed", 0.002 }
-        //    }
-        //}
-        ];
+    private static readonly LevelEvent[] events = [new EscapeEvent(2, 6, 4, 0.0022, 0.002)];
 
     public event EventHandler? OnRequestClose;
 
@@ -48,7 +30,7 @@ public partial class EventSelectorWindowViewModel : ObservableObject
         if (_selectedEvent is not null)
         {
             WeakReferenceMessenger.Default.Send(new EventSelectedMessage(SelectedEvent!));
-            this.OnRequestClose?.Invoke(this, EventArgs.Empty);
+            OnRequestClose?.Invoke(this, EventArgs.Empty);
         }
     }
 
