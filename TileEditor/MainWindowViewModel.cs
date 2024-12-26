@@ -62,10 +62,16 @@ public partial class LevelProperties : ObservableObject
 
     [ObservableProperty]
     private string _nextLevel = "levels/level1.json";
+
+    [ObservableProperty]
+    private string? _initialEventKey = "free_camera_event";
 }
 
 public partial class MainWindowViewModel : ObservableObject
 {
+    [ObservableProperty]
+    private string[] _initialEventKeys = ["free_camera_event", "outro_event"];
+
     [ObservableProperty]
     private ObservableCollection<LevelEvent> _levelEvents = [];
 
@@ -374,7 +380,8 @@ public partial class MainWindowViewModel : ObservableObject
             LevelEnd = levelEnd,
             Start = start,
             DefaultLayer = Layers.IndexOf(DefaultLayer),
-            Events = [.. events]
+            Events = [.. events],
+            InitialEventKey = LevelProperties.InitialEventKey
         };
 
         var levelName = LevelProperties.Name;
@@ -634,6 +641,7 @@ public partial class MainWindowViewModel : ObservableObject
                     BackgroundPath = levelEntity.Background,
                     MusicPath = levelEntity.Music,
                     NextLevel = levelEntity.NextLevel,
+                    InitialEventKey = levelEntity.InitialEventKey
                 };
                 LevelProperties = props;
 

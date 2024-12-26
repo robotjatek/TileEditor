@@ -11,7 +11,10 @@ public class EventSelectedMessage(LevelEvent value) : ValueChangedMessage<LevelE
 
 public partial class EventSelectorWindowViewModel : ObservableObject
 {
-    private static readonly LevelEvent[] events = [new EscapeEvent(2, 6, 4, 0.0022, 0.002)];
+    private static readonly LevelEvent[] events = [
+        new EscapeEvent(2, 6, 4, 0.0022, 0.002),
+        new BossEvent(20, 32, 32, 10, 10) // TODO: ezek a hardcoded default értékek nem valami szépek itt
+     ];
 
     public event EventHandler? OnRequestClose;
 

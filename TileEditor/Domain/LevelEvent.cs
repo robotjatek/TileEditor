@@ -49,13 +49,42 @@ public partial class EscapeEvent : LevelEvent
         CameraSpeed = cameraSpeed;
         
         RefreshProps();
+    }
+}
 
-        /*
-           { "eventLayerId", 2 },
-           { "eventLayerStopPosition", 6 },
-           { "cameraStopPosition", 4 },
-           { "eventLayerSpeed", 0.0022 },
-           { "cameraSpeed", 0.002 }
-         */
+// TODO: ha egy olyan pályát töltök be amiből hiányzik egy mező, pl a health, akkor a props windowban nem jelenik meg a field
+public partial class BossEvent : LevelEvent
+{
+
+    [ObservableProperty]
+    private int _enterWaypointX = 0;
+
+    [ObservableProperty]
+    private int _enterWaypointY = 0;
+
+    [ObservableProperty]
+    private int _spawnX = 0;
+
+    [ObservableProperty]
+    private int _spawnY = 0;
+
+    [ObservableProperty]
+    private int _health = 10;
+
+
+    public BossEvent(int enterX, int enterY, int spawnX, int spawnY, int health) 
+    {
+        Type = "boss_event";
+        EnterWaypointX = enterX;
+        EnterWaypointY = enterY;
+        SpawnX = spawnX;
+        SpawnY = spawnY;
+        Health = health;
+
+        Props["enterWaypointX"] = EnterWaypointX;
+        Props["enterWaypointY"] = EnterWaypointY;
+        Props["spawnX"] = SpawnX;
+        Props["spawnY"] = SpawnY;
+        Props["health"] = Health;
     }
 }

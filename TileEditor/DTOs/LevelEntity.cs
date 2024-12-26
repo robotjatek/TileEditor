@@ -67,4 +67,6 @@ public class LevelEntity
     public string NextLevel { get; set; }
 
     public EventEntity[] Events { get; set; } = [];
+
+    public string? InitialEventKey { get; set; }
 }

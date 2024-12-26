@@ -7,7 +7,8 @@
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
-        Title="Level Properties">
+        Title="Level Properties"
+    xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2">
 
     <WindowChrome.WindowChrome>
         <shell:WindowChrome CaptionHeight="36" GlassFrameThickness="0" CornerRadius="0" ResizeBorderThickness="5"/>
@@ -127,6 +128,76 @@
                 <Label Grid.Row="4" Grid.Column="0">Music</Label>
                 <TextBox Grid.Row="4" Grid.Column="1" IsReadOnly="True" Text="{Binding LevelProperties.MusicPath}"></TextBox>
                 <Button Grid.Row="4" Grid.Column="2" Command="{Binding PickMusicCommand}">...</Button>
+
+                <Label Grid.Row="5" Grid.Column="0">Initial Event</Label>
+                <ComboBox Style="{DynamicResource ComboBoxStyle1}" Grid.Row="5" Grid.Column="1" ItemsSource="{Binding InitialEventKeys}" SelectedItem="{Binding LevelProperties.InitialEventKey}">
+                    <!-- Style -->
+                    <ComboBox.Resources>
+                        <Style TargetType="ToggleButton" x:Key="ComboBoxToggleButtonStyle">
+                            <Setter Property="Background" Value="#303040"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="BorderBrush" Value="White"/>
+                            <Setter Property="BorderThickness" Value="0.8"/>
+                            <Setter Property="Padding" Value="5"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="FontSize" Value="16" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Grid>
+                                            <Border Name="Border"
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                                <Grid>
+                                                    <ContentPresenter HorizontalAlignment="Left"
+                                                                      VerticalAlignment="Center"
+                                                                      Margin="5,0,20,0" />
+                                                    <Path Name="Arrow"
+                                                          Data="M 0 0 L 4 4 L 8 0 Z" 
+                                                          Fill="White"
+                                                          HorizontalAlignment="Right" 
+                                                          VerticalAlignment="Center" 
+                                                          Margin="0,0,10,0" />
+                                                </Grid>
+                                            </Border>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="#4D4D66" />
+                                                <Setter TargetName="Border" Property="BorderBrush" Value="White" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ComboBox.Resources>
+
+                    <!-- Template -->
+                    <ComboBox.Template>
+                        <ControlTemplate TargetType="ComboBox">
+                            <Grid>
+                                <!-- ToggleButton -->
+                                <ToggleButton Name="ToggleButton"
+                                      Content="{TemplateBinding SelectionBoxItem}"
+                                      Style="{StaticResource ComboBoxToggleButtonStyle}"
+                                      HorizontalContentAlignment="Left"
+                                      IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                <!-- Popup -->
+                                <Popup Name="Popup" IsOpen="{TemplateBinding IsDropDownOpen}"
+                                        Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ComboBox}}">
+                                    <Border Background="#303040" BorderBrush="Black" BorderThickness="1">
+                                        <ScrollViewer>
+                                            <ItemsPresenter />
+                                        </ScrollViewer>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </ControlTemplate>
+                    </ComboBox.Template>
+                </ComboBox>
             </Grid>
         </StackPanel>
     </Border>
