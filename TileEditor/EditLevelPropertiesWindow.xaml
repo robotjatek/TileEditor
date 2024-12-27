@@ -126,7 +126,7 @@
                 <Button Grid.Row="3" Grid.Column="2" Command="{Binding PickBackgroundCommand}">...</Button>
 
                 <Label Grid.Row="4" Grid.Column="0">Music</Label>
-                <TextBox Grid.Row="4" Grid.Column="1" IsReadOnly="True" Text="{Binding LevelProperties.MusicPath}"></TextBox>
+                <TextBox Grid.Row="4" Grid.Column="1" IsReadOnly="False" Text="{Binding LevelProperties.MusicPath}"></TextBox>
                 <Button Grid.Row="4" Grid.Column="2" Command="{Binding PickMusicCommand}">...</Button>
 
                 <Label Grid.Row="5" Grid.Column="0">Initial Event</Label>
