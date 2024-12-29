@@ -59,7 +59,6 @@ public class StartGameObject : GameObject
     }
 }
 
-// TODO: make multiple end objects possible
 public class EndGameObject : GameObject
 {
     public EndGameObject()
