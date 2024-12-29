@@ -18,13 +18,6 @@ public class GameObjectEntity
     public int YPos { get; set; }
 }
 
-public class LevelEndEntity
-{
-    public int XPos { get; set; }
-
-    public int YPos { get; set; }
-}
-
 public class StartEntity
 {
     public int XPos { get; set; }
@@ -59,8 +52,6 @@ public class LevelEntity
     public int DefaultLayer { get; set; }
 
     public GameObjectEntity[] GameObjects { get; set; } = [];
-
-    public LevelEndEntity? LevelEnd { get; set; }
 
     public StartEntity? Start { get; set; }
 

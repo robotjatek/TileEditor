@@ -246,12 +246,6 @@ public partial class MainWindowViewModel : ObservableObject
                 if (existingStart != null)
                     existingStart.GameObject = null;
             }
-            else if (SelectedGameObject is EndGameObject) // TODO: make multiple end objects possible (needs game engine support)
-            {
-                var existingEnd = SelectedLayer.Tiles.Where(t => t.GameObject?.Type == "end").FirstOrDefault();
-                if (existingEnd != null)
-                    existingEnd.GameObject = null;
-            }
 
             var clickedTile = SelectedLayer.GetTile(x, y);
             if (clickedTile != null)
@@ -300,7 +294,6 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         StartEntity? start = null;
-        LevelEndEntity? levelEnd = null;
 
         var gameObjects = DefaultLayer.Tiles.Select((t, i) =>
         {
@@ -321,15 +314,6 @@ public partial class MainWindowViewModel : ObservableObject
                 };
                 return null;
             }
-            else if (gameObject.Type == "end")
-            {
-                levelEnd = new LevelEndEntity
-                {
-                    XPos = posX,
-                    YPos = posY,
-                };
-                return null; // TODO: handle level end as a proper game object (Needs engine support)
-            }
 
             return new GameObjectEntity
             {
@@ -338,14 +322,6 @@ public partial class MainWindowViewModel : ObservableObject
                 YPos = posY
             };
         }).Where(g => g != null).ToArray();
-
-        if (levelEnd is null)
-        {
-            var result = new EditorMessageBox("Level end is not set. Levels like this can be saved, but the game wont work with incomplete levels. Do you want to proceed?",
-                "Warning", Buttons.OK_CANCEL).ShowDialog();
-            if (result != CustomDialogResult.OK)
-                return;
-        }
 
         if (start is null)
         {
@@ -377,7 +353,6 @@ public partial class MainWindowViewModel : ObservableObject
             Music = LevelProperties.MusicPath,
             NextLevel = LevelProperties.NextLevel,
             Layers = [.. layers],
-            LevelEnd = levelEnd,
             Start = start,
             DefaultLayer = Layers.IndexOf(DefaultLayer),
             Events = [.. events],
@@ -696,12 +671,6 @@ public partial class MainWindowViewModel : ObservableObject
                 {
                     var startIndex = levelEntity.Start.YPos * defaultLayerWidth + levelEntity.Start.XPos;
                     Layers[levelEntity.DefaultLayer].Tiles[startIndex].GameObject = new StartGameObject();
-                }
-
-                if (levelEntity.LevelEnd != null)
-                {
-                    var endIndex = levelEntity.LevelEnd.YPos * defaultLayerWidth + levelEntity.LevelEnd.XPos;
-                    Layers[levelEntity.DefaultLayer].Tiles[endIndex].GameObject = new EndGameObject();
                 }
 
                 // Attach game objects to tiles
