@@ -50,6 +50,15 @@ public partial class EscapeEvent : LevelEvent
         
         RefreshProps();
     }
+
+}
+
+public partial class OutroEvent : LevelEvent
+{
+    public OutroEvent()
+    {
+        Type = "outro_event";
+    }
 }
 
 // TODO: ha egy olyan pályát töltök be amiből hiányzik egy mező, pl a health, akkor a props windowban nem jelenik meg a field

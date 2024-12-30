@@ -69,6 +69,7 @@ public partial class LevelProperties : ObservableObject
 
 public partial class MainWindowViewModel : ObservableObject
 {
+    // TODO: except for free cam others should be based on the the events added to the level
     [ObservableProperty]
     private string[] _initialEventKeys = ["free_camera_event", "outro_event"];
 
