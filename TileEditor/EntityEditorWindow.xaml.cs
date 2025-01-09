@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace TileEditor.EntityEditorWindow;
+namespace TileEditor;
 
 /// <summary>
 /// Interaction logic for EntityEditorWindow.xaml

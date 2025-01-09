@@ -11,7 +11,6 @@ using System.Text.Json;
 
 using TileEditor.Domain;
 using TileEditor.DTOs;
-using TileEditor.EntityEditorWindow;
 using TileEditor.EventEditorWindow;
 using TileEditor.EventSelectorWindow;
 
@@ -121,8 +120,8 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void OpenEntityEditorWindow(GameObject gameObject)
     {
-        var vm = new EntityEditorWindowViewModel(gameObject);
-        var wnd = new EntityEditorWindow.EntityEditorWindow(vm);
+        var vm = new EntityEditorWindowViewModel(gameObject, GameObjects.Select(x => x.Name).Where(x => x is not null)!);
+        var wnd = new EntityEditorWindow(vm);
         vm.OnRequestClose += (_, _) => wnd.Close();
         wnd.Show();
     }
