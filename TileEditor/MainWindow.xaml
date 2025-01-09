@@ -131,8 +131,15 @@
                     <RowDefinition Height="2*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                
-                <local:LayerSelector Grid.Row="0"/>
+
+                <TabControl>
+                    <TabItem Header="Layers" Grid.Row="0">
+                        <local:LayerSelector/>
+                    </TabItem>
+                    <TabItem Header="Entities" Grid.Row="0">
+                        <local:LevelEntityListControl />
+                    </TabItem>
+                </TabControl>
 
                 <local:EventPanel Grid.Row="1"/>
             </Grid>

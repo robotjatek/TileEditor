@@ -23,7 +23,7 @@
                                    VerticalAlignment="Center" 
                                    TextAlignment="Center"
                                    TextWrapping="Wrap"
-                                   Text="{Binding GameObject.Type}" />
+                                   Text="{Binding GameObject.Label}" />
                     </Border>
                 </StackPanel>
             </DataTemplate>
@@ -42,7 +42,7 @@
                                    VerticalAlignment="Center" 
                                    TextAlignment="Center"
                                    TextWrapping="Wrap"
-                                   Text="{Binding GameObject.Type}" />
+                                   Text="{Binding GameObject.Label}" />
                     </Grid>
                 </Border>
             </DataTemplate>

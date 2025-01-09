@@ -75,6 +75,37 @@
             </Style.Triggers>
         </Style>
 
+        <Style TargetType="TabControl">
+            <Setter Property="Background" Value="#303040" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style TargetType="TabItem">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid x:Name="mouseOverGrid">
+                            <Border x:Name="itemBorder" Padding="10 5 10 5" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Center" Background="#303040" BorderBrush="White" BorderThickness="1">
+                                <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header"/>
+                            </Border>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="itemBorder" Property="Height" Value="27" />
+                                <Setter TargetName="itemBorder" Property="Background" Value="#4D4D66" />
+                            </Trigger>
+
+                            <Trigger SourceName="mouseOverGrid" Property="IsMouseOver" Value="True">
+                                <Setter TargetName="itemBorder" Property="Background" Value="#4D4D66" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="closeButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">

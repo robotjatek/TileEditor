@@ -11,6 +11,7 @@ using System.Text.Json;
 
 using TileEditor.Domain;
 using TileEditor.DTOs;
+using TileEditor.EntityEditorWindow;
 using TileEditor.EventEditorWindow;
 using TileEditor.EventSelectorWindow;
 
@@ -90,6 +91,16 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void RemoveGameObject(GameObject gameObject)
+    {
+        if (DefaultLayer == null)
+            return;
+
+        DefaultLayer.Tiles.First(t => t.GameObject == gameObject).GameObject = null;
+        OnPropertyChanged(nameof(GameObjects));
+    }
+
+    [RelayCommand]
     private void OpenEventEditorWindow(LevelEvent @event)
     {
         var vm = new EventEditorViewModel(@event);
@@ -103,6 +114,15 @@ public partial class MainWindowViewModel : ObservableObject
     {
         var vm = new EventSelectorWindowViewModel();
         var wnd = new EventSelectorWindow.EventSelectorWindow(vm);
+        vm.OnRequestClose += (_, _) => wnd.Close();
+        wnd.Show();
+    }
+
+    [RelayCommand]
+    private void OpenEntityEditorWindow(GameObject gameObject)
+    {
+        var vm = new EntityEditorWindowViewModel(gameObject);
+        var wnd = new EntityEditorWindow.EntityEditorWindow(vm);
         vm.OnRequestClose += (_, _) => wnd.Close();
         wnd.Show();
     }
@@ -146,9 +166,11 @@ public partial class MainWindowViewModel : ObservableObject
     private ObservableCollection<Layer> _layers = [];
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(GameObjects))]
     private Layer? _selectedLayer;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(GameObjects))]
     private Layer? _defaultLayer;
 
     [ObservableProperty]
@@ -158,6 +180,17 @@ public partial class MainWindowViewModel : ObservableObject
     public bool CanSave
     {
         get => LevelProperties is not null;
+    }
+
+    public List<GameObject> GameObjects
+    {
+        get
+        {
+            if (DefaultLayer == null)
+                return [];
+
+            return DefaultLayer.Tiles.Select(t => t.GameObject).Where(o => o is not null).ToList()!;
+        }
     }
 
     public MainWindowViewModel()
@@ -250,8 +283,28 @@ public partial class MainWindowViewModel : ObservableObject
 
             var clickedTile = SelectedLayer.GetTile(x, y);
             if (clickedTile != null)
-                clickedTile.GameObject = SelectedGameObject.Clone();
+            {
+                var toAdd = SelectedGameObject.Clone();
+                toAdd.Name = GenerateUniqueName(toAdd.Type!);
+                clickedTile.GameObject = toAdd;
+            }
         }
+
+        OnPropertyChanged(nameof(GameObjects));
+    }
+
+    private string GenerateUniqueName(string type)
+    {
+        int count = GameObjects.Count;
+        int uniqueId = count;
+
+        var existingNames = GameObjects.Select(x => x.Name).ToHashSet();
+        while (existingNames.Contains($"{type}-{uniqueId}"))
+        {
+            uniqueId++;
+        }
+
+        return $"{type}-{uniqueId}";
     }
 
     [RelayCommand]
@@ -318,9 +371,11 @@ public partial class MainWindowViewModel : ObservableObject
 
             return new GameObjectEntity
             {
+                // TODO: props
                 Type = gameObject.Type!,
                 XPos = posX,
-                YPos = posY
+                YPos = posY,
+                Name = gameObject.Label
             };
         }).Where(g => g != null).ToArray();
 
@@ -680,7 +735,9 @@ public partial class MainWindowViewModel : ObservableObject
                     var index = go.YPos * defaultLayerWidth + go.XPos;
                     Layers[levelEntity.DefaultLayer].Tiles[index].GameObject = new GameObject()
                     {
-                        Type = go.Type
+                        Type = go.Type,
+                        Name = go.Name
+                        // TODO: read props from entity
                     };
                 }
 
