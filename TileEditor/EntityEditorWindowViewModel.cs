@@ -12,6 +12,7 @@ public partial class EntityEditorWindowViewModel(GameObject gameObject, IEnumera
 {
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasErrors))]
     private string? _name = gameObject.Name;
 
     public ObservableCollection<string> ExistingStrings { get; } = new(objectNames);
@@ -35,7 +36,7 @@ public partial class EntityEditorWindowViewModel(GameObject gameObject, IEnumera
         }
     }
 
-
+    public bool HasErrors => !string.IsNullOrEmpty(this[nameof(Name)]);
 
     public event EventHandler? OnRequestClose;
 

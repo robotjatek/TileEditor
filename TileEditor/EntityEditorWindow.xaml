@@ -14,6 +14,8 @@
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
+        <local:BooleanInverter x:Key="BooleanInverter"/>
+
         <Style TargetType="local:EntityEditorWindow">
             <Setter Property="Background" Value="#303040" />
             <Setter Property="SizeToContent" Value="Height" />
@@ -154,7 +156,7 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0" Command="{Binding OkClickedCommand}"  
-                        IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=HasValidationErrors}">
+                        IsEnabled="{Binding HasErrors, Converter={StaticResource BooleanInverter}}">
                     OK
                 </Button>
                 
