@@ -13,7 +13,7 @@ public partial class EntityEditorWindowViewModel(GameObject gameObject, IEnumera
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasErrors))]
-    private string? _name = gameObject.Name;
+    private string? _name = gameObject.Label;
 
     public ObservableCollection<string> ExistingStrings { get; } = new(objectNames);
 

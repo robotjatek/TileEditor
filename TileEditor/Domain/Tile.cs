@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
+using System.Windows.Media;
+
 namespace TileEditor.Domain;
 
 public partial class Tile : ObservableObject
@@ -8,6 +10,8 @@ public partial class Tile : ObservableObject
     protected string? _texturePath = null;
     [ObservableProperty]
     protected GameObject? _gameObject = null;
+
+    public ImageSource? Texture => ImageCache.GetImage(_texturePath);
 
     public Tile() { }
 
