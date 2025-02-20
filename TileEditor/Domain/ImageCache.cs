@@ -21,4 +21,9 @@ public static class ImageCache
         }
         return value;
     }
+
+    public static void Clear()
+    {
+        _cache.Clear();
+    }
 }
