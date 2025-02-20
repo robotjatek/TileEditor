@@ -647,6 +647,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private async Task OpenLevel()
     {
+        ImageCache.Clear();
         var dialog = new OpenFileDialog()
         {
             Filter = "JSON|*.json",

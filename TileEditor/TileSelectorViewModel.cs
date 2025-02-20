@@ -34,6 +34,7 @@ internal partial class TileSelectorViewModel : ObservableObject
         {
             Multiselect = true,
             Title = "Add tiles...",
+            Filter = "Image files (*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp",
         };
 
         if (dialog.ShowDialog() == true)

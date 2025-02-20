@@ -15,10 +15,19 @@ public static class ImageCache
 
         if (!_cache.TryGetValue(path, out BitmapImage? value))
         {
-            var image = new BitmapImage(new Uri(path));
+            var image = new BitmapImage(new Uri(path))
+            {
+                CreateOptions = BitmapCreateOptions.IgnoreImageCache | BitmapCreateOptions.DelayCreation
+            };
             value = image;
             _cache[path] = value;
+            image.Freeze();
         }
         return value;
+    }
+
+    public static void Clear()
+    {
+        _cache.Clear();
     }
 }
