@@ -7,6 +7,13 @@ using System.Windows.Media;
 
 namespace TileEditor;
 
+// TODO: canvas based tile rendering instead of UnifromGrid
+// TODO: tile placement preview
+// TODO: select multiple tiles
+// TODO: place the selected tiles at once (batch copy)
+// TODO: batch tile placement preview
+// TODO: layer name + rename
+// TODO: zoom to mouse position
 /// <summary>
 /// Interaction logic for LayerEditor.xaml
 /// </summary>
@@ -19,6 +26,7 @@ public partial class LayerEditor : UserControl
     private double _zoom = 1.0;
 
     private Vector? _lastTilePosition = null;
+    private Vector? _layerMovePosition = null;
 
     public LayerEditor()
     {
@@ -84,9 +92,32 @@ public partial class LayerEditor : UserControl
 
     private void UniformGrid_MouseMove(object sender, MouseEventArgs e)
     {
+        var vm = (DataContext as MainWindowViewModel)!;
+        var grid = sender as UniformGrid;
+
+        if (e.LeftButton == MouseButtonState.Pressed && _layerMovePosition.HasValue)
+        {
+            var mousePosition = e.GetPosition(grid);
+            var gridIdX = (int)mousePosition.X / 64;
+            var gridIdY = (int)mousePosition.Y / 64;
+            var currentMousePosition = new Vector(gridIdX, gridIdY);
+
+            var dx = gridIdX - (int)_layerMovePosition.Value.X;
+            var dy = gridIdY - (int)_layerMovePosition.Value.Y;
+
+            if (dx != 0 || dy != 0)
+            {
+                dx = Math.Clamp(dx, -1, 1);
+                dy = Math.Clamp(dy, -1, 1);
+                _layerMovePosition = currentMousePosition;
+                // TODO: command + undo command for move tile operation
+                vm.MoveTiles(vm.SelectedLayer!, dx, dy);
+            }
+            return;
+        }
+
         if (e.LeftButton == MouseButtonState.Pressed)
         {
-            var grid = sender as UniformGrid;
             var mousePosition = e.GetPosition(grid);
             var gridIdX = (int)mousePosition.X / 64;
             var gridIdY = (int)mousePosition.Y / 64;
@@ -94,31 +125,44 @@ public partial class LayerEditor : UserControl
 
             if (!_lastTilePosition.HasValue || currentTilePosition != _lastTilePosition.Value)
             {
-                var vm = this.DataContext as MainWindowViewModel;
                 _lastTilePosition = currentTilePosition;
                 vm!.PlaceSelected(gridIdX, gridIdY);
             }
+            return;
         }
     }
 
     private void UniformGrid_MouseDown(object sender, MouseButtonEventArgs e)
     {
-        // Handle single click "paint"
-        if (e.ChangedButton == MouseButton.Left)
-        {
-            var grid = sender as UniformGrid;
+        var vm = (DataContext as MainWindowViewModel)!;
+        var grid = sender as UniformGrid;
 
+        // Handle move tool
+        if (vm.Tool == DrawTool.MOVE && e.ChangedButton == MouseButton.Left)
+        {
             var mousePosition = e.GetPosition(grid);
             var gridIdX = (int)mousePosition.X / 64;
             var gridIdY = (int)mousePosition.Y / 64;
+            _layerMovePosition = new Vector(gridIdX, gridIdY);
+            Mouse.Capture(grid);
+            return;
+        }
 
-            var vm = this.DataContext as MainWindowViewModel;
-            vm!.PlaceSelected(gridIdX, gridIdY);
+        // Handle single click "paint"
+        if (e.ChangedButton == MouseButton.Left)
+        {
+            var mousePosition = e.GetPosition(grid);
+            var gridIdX = (int)mousePosition.X / 64;
+            var gridIdY = (int)mousePosition.Y / 64;
+            vm.PlaceSelected(gridIdX, gridIdY);
+            return;
         }
     }
 
     private void UniformGrid_MouseUp(object sender, MouseButtonEventArgs e)
     {
+        _layerMovePosition = null;
         _lastTilePosition = null;
+        Mouse.Capture(null);
     }
 }

@@ -47,6 +47,12 @@ public class DrawTool
         Content = "\uE138",
         Tooltip = "Square placement"
     };
+
+    public static readonly DrawTool MOVE = new()
+    {
+        Content = "\ue20e",
+        Tooltip = "Move layer"
+    };
 }
 
 public partial class LevelProperties : ObservableObject
@@ -135,6 +141,7 @@ public partial class MainWindowViewModel : ObservableObject
         DrawTool.ROW,
         DrawTool.COLUMN,
         DrawTool.SQUARE,
+        DrawTool.MOVE
     ];
 
     [ObservableProperty]
@@ -535,6 +542,62 @@ public partial class MainWindowViewModel : ObservableObject
 
         LayerWidth = resizedX;
         LayerHeight = resizedY;
+    }
+
+    public void MoveTiles(Layer layer, int dirX, int dirY)
+    {
+        var w = layer.Width;
+        var h = layer.Height;
+        var newTiles = new Tile[w * h];
+
+        // Only move the layer if the tiles do not move out of bounds
+        if (dirY < 0 && !IsRowEmpty(layer, 0)) return;
+        if (dirY > 0 && !IsRowEmpty(layer, h - 1)) return;
+        if (dirX < 0 && !IsColumnEmpty(layer, 0)) return;
+        if (dirX > 0 && !IsColumnEmpty(layer, w - 1)) return;
+
+        for (var x = 0; x < layer.Width; x++)
+        {
+            for (var y = 0; y < layer.Height; y++)
+            {
+                var srcX = x - dirX;
+                var srcY = y - dirY;
+                var currentTile = layer.GetTile(srcX, srcY)!;
+                if (srcY >= 0 && srcY < h && srcX >= 0 && srcX < w)
+                    newTiles[y * w + x] = currentTile;
+                else
+                    newTiles[y * w + x] = new Tile();
+
+            }
+        }
+
+        layer.Tiles = new ObservableCollection<Tile>(newTiles);
+        // TODO: ezt itthagyom még kicsit mert nem tudom hogy milyen mellékhatása lehet máshol hogy ha a layer.Tilest felülírom
+        //layer.Tiles.Clear();
+        //foreach (var tile in newTiles)
+        //{
+        //    layer.Tiles.Add(tile);
+        //}
+    }
+
+    private bool IsRowEmpty(Layer layer, int row)
+    {
+        for (var i = 0; i < layer.Width; i++)
+        {
+            if (!layer.GetTile(i, row)!.IsEmpty)
+                return false;
+        }
+        return true;
+    }
+
+    private bool IsColumnEmpty(Layer layer, int column)
+    {
+        for (var i = 0; i < layer.Height; i++)
+        {
+            if (!layer.GetTile(column, i)!.IsEmpty)
+                return false;
+        }
+        return true;
     }
 
     [RelayCommand]
