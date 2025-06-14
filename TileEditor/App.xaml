@@ -137,6 +137,10 @@
             </Setter>
         </Style>
 
+        <Style TargetType="StatusBar">
+            <Setter Property="Background" Value="#4D4D66" />
+        </Style>
+
 
         <ControlTemplate x:Key="horizontalScrollbar" TargetType="ScrollBar">
             <Grid>

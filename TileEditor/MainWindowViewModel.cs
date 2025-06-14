@@ -8,6 +8,7 @@ using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
+using System.Windows;
 
 using TileEditor.Domain;
 using TileEditor.DTOs;
@@ -182,6 +183,9 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanSave))]
     private LevelProperties? _levelProperties;
+
+    [ObservableProperty]
+    private Vector _currentMousePosition = new(0, 0);
 
     public bool CanSave
     {
@@ -710,6 +714,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private async Task OpenLevel()
     {
+        CurrentMousePosition = new Vector(0, 0);
         ImageCache.Clear();
         var dialog = new OpenFileDialog()
         {

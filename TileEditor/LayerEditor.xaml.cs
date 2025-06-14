@@ -7,7 +7,7 @@ using System.Windows.Media;
 
 namespace TileEditor;
 
-// TODO: canvas based tile rendering instead of UnifromGrid
+// TODO: canvas based tile rendering instead of UniformGrid
 // TODO: tile placement preview
 // TODO: select multiple tiles
 // TODO: place the selected tiles at once (batch copy)
@@ -94,14 +94,14 @@ public partial class LayerEditor : UserControl
     {
         var vm = (DataContext as MainWindowViewModel)!;
         var grid = sender as UniformGrid;
+        var mousePosition = e.GetPosition(grid);
+        var gridIdX = (int)mousePosition.X / 64;
+        var gridIdY = (int)mousePosition.Y / 64;
+        var currentMousePosition = new Vector(gridIdX, gridIdY);
+        vm.CurrentMousePosition = currentMousePosition;
 
         if (e.LeftButton == MouseButtonState.Pressed && _layerMovePosition.HasValue)
         {
-            var mousePosition = e.GetPosition(grid);
-            var gridIdX = (int)mousePosition.X / 64;
-            var gridIdY = (int)mousePosition.Y / 64;
-            var currentMousePosition = new Vector(gridIdX, gridIdY);
-
             var dx = gridIdX - (int)_layerMovePosition.Value.X;
             var dy = gridIdY - (int)_layerMovePosition.Value.Y;
 
@@ -118,14 +118,9 @@ public partial class LayerEditor : UserControl
 
         if (e.LeftButton == MouseButtonState.Pressed)
         {
-            var mousePosition = e.GetPosition(grid);
-            var gridIdX = (int)mousePosition.X / 64;
-            var gridIdY = (int)mousePosition.Y / 64;
-            var currentTilePosition = new Vector(gridIdX, gridIdY);
-
-            if (!_lastTilePosition.HasValue || currentTilePosition != _lastTilePosition.Value)
+            if (!_lastTilePosition.HasValue || currentMousePosition != _lastTilePosition.Value)
             {
-                _lastTilePosition = currentTilePosition;
+                _lastTilePosition = currentMousePosition;
                 vm!.PlaceSelected(gridIdX, gridIdY);
             }
             return;
@@ -136,13 +131,13 @@ public partial class LayerEditor : UserControl
     {
         var vm = (DataContext as MainWindowViewModel)!;
         var grid = sender as UniformGrid;
+        var mousePosition = e.GetPosition(grid);
+        var gridIdX = (int)mousePosition.X / 64;
+        var gridIdY = (int)mousePosition.Y / 64;
 
         // Handle move tool
         if (vm.Tool == DrawTool.MOVE && e.ChangedButton == MouseButton.Left)
         {
-            var mousePosition = e.GetPosition(grid);
-            var gridIdX = (int)mousePosition.X / 64;
-            var gridIdY = (int)mousePosition.Y / 64;
             _layerMovePosition = new Vector(gridIdX, gridIdY);
             Mouse.Capture(grid);
             return;
@@ -151,9 +146,6 @@ public partial class LayerEditor : UserControl
         // Handle single click "paint"
         if (e.ChangedButton == MouseButton.Left)
         {
-            var mousePosition = e.GetPosition(grid);
-            var gridIdX = (int)mousePosition.X / 64;
-            var gridIdY = (int)mousePosition.Y / 64;
             vm.PlaceSelected(gridIdX, gridIdY);
             return;
         }
