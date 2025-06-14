@@ -14,13 +14,9 @@ internal class TileSelector : DataTemplateSelector
     public override DataTemplate SelectTemplate(object item, DependencyObject container)
     {
         Tile tile = (Tile)item;
-        if (tile.TexturePath == null)
-        {
+        if (tile.TexturePath is null)
             return EmptyTile;
-        }
         else
-        {
             return NormalTile;
-        }
     }
 }
