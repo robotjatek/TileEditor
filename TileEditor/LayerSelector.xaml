@@ -30,7 +30,7 @@
                         </Grid.ColumnDefinitions>
 
                         <Border Grid.Column="0" Height="64" BorderBrush="White" BorderThickness="1">
-                            <Label>Layer</Label>
+                            <Label Content="{Binding Name}"/>
                         </Border>
                         <Border Padding="5" Grid.Column="1" BorderBrush="White" BorderThickness="1">
                             <CheckBox IsEnabled="False" IsChecked="{Binding IsDefault, Mode=OneWay}"/>

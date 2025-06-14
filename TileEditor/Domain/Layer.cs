@@ -7,6 +7,9 @@ namespace TileEditor.Domain;
 public partial class Layer : ObservableObject
 {
     [ObservableProperty]
+    private string _name = "New layer";
+
+    [ObservableProperty]
     private int _width;
 
     [ObservableProperty]

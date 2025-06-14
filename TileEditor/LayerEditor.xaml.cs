@@ -12,7 +12,6 @@ namespace TileEditor;
 // TODO: select multiple tiles
 // TODO: place the selected tiles at once (batch copy)
 // TODO: batch tile placement preview
-// TODO: layer name + rename
 // TODO: zoom to mouse position
 /// <summary>
 /// Interaction logic for LayerEditor.xaml

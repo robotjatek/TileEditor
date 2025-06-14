@@ -10,6 +10,9 @@ partial class LayerPropertiesWindowViewModel(Layer layer) : ObservableObject
     public event EventHandler? OnRequestClose;
 
     [ObservableProperty]
+    private string _name = layer.Name;
+
+    [ObservableProperty]
     private string _parallaxOffsetX = layer.ParallaxOffsetFactorX.ToString();
 
     [ObservableProperty]
@@ -24,6 +27,7 @@ partial class LayerPropertiesWindowViewModel(Layer layer) : ObservableObject
     [RelayCommand]
     private void Ok()
     {
+        layer.Name = _name;
         layer.ParallaxOffsetFactorX = double.Parse(_parallaxOffsetX);
         layer.ParallaxOffsetFactorY = double.Parse(_parallaxOffsetY);
         layer.LayerOffsetX = double.Parse(_layerOffsetX);

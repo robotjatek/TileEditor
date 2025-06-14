@@ -349,6 +349,7 @@ public partial class MainWindowViewModel : ObservableObject
 
             layers.Add(new LayerEntity
             {
+                Name = item.Name,
                 Tiles = tiles!,
                 ParallaxOffsetFactorX = item.ParallaxOffsetFactorX,
                 ParallaxOffsetFactorY = item.ParallaxOffsetFactorY,
@@ -771,6 +772,7 @@ public partial class MainWindowViewModel : ObservableObject
 
                     var currentLayer = new Layer
                     {
+                        Name = layerEntity.Name,
                         IsDefault = i == levelEntity.DefaultLayer,
                         Tiles = [.. tiles],
                         Height = layerHeight,

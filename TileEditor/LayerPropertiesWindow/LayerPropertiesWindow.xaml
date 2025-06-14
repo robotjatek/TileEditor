@@ -122,10 +122,18 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0">X Parallax factor</Label>
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbOffsetXFactor">
+                <Label Grid.Row="0" Grid.Column="0">Layer name</Label>
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbLayerName">
+                    <TextBox.Text>
+                        <Binding Path="Name" UpdateSourceTrigger="PropertyChanged" />
+                    </TextBox.Text>
+                </TextBox>
+
+                <Label Grid.Row="1" Grid.Column="0">X Parallax factor</Label>
+                <TextBox Grid.Row="1" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbOffsetXFactor">
                     <TextBox.Text>
                         <Binding Path="ParallaxOffsetX" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
@@ -135,8 +143,8 @@
                     </TextBox.Text>
                 </TextBox>
 
-                <Label Grid.Row="1" Grid.Column="0">Y Parallax factor</Label>
-                <TextBox Grid.Row="1" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbOffsetYFactor">
+                <Label Grid.Row="2" Grid.Column="0">Y Parallax factor</Label>
+                <TextBox Grid.Row="2" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbOffsetYFactor">
                     <TextBox.Text>
                         <Binding Path="ParallaxOffsetY" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
@@ -146,8 +154,8 @@
                     </TextBox.Text>
                 </TextBox>
 
-                <Label Grid.Row="2" Grid.Column="0">X layer offset</Label>
-                <TextBox Grid.Row="2" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbLayerOffsetX">
+                <Label Grid.Row="3" Grid.Column="0">X layer offset</Label>
+                <TextBox Grid.Row="3" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbLayerOffsetX">
                     <TextBox.Text>
                         <Binding Path="LayerOffsetX" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
@@ -157,8 +165,8 @@
                     </TextBox.Text>
                 </TextBox>
 
-                <Label Grid.Row="3" Grid.Column="0">Y layer offset</Label>
-                <TextBox Grid.Row="3" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbLayerOffsetY">
+                <Label Grid.Row="4" Grid.Column="0">Y layer offset</Label>
+                <TextBox Grid.Row="4" Grid.Column="1" Margin="0, 0, 0, 25" x:Name="tbLayerOffsetY">
                     <TextBox.Text>
                         <Binding Path="LayerOffsetY" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>

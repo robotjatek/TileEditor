@@ -29,6 +29,7 @@ public class StartEntity
 
 public class LayerEntity
 {
+    public string Name { get; set; } = "New layer";
     public TileEntity[] Tiles { get; set; } = [];
     public double ParallaxOffsetFactorX { get; set; }
     public double ParallaxOffsetFactorY { get; set; }
