@@ -44,6 +44,10 @@ public partial class EntitySelectorViewModel : ObservableObject
         {
             Type = "boss_trigger"
         },
+        new GameObject
+        {
+            Type = "lever"
+        },
 
         new StartGameObject(),
         new EndGameObject(),
