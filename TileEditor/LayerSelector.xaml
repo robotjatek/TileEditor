@@ -3,10 +3,78 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
              xmlns:local="clr-namespace:TileEditor"
+             xmlns:domain="clr-namespace:TileEditor.Domain"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="LayerDragAdornerTemplate" DataType="{x:Type domain:Layer}">
+            <Grid Height="64">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="8*" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Height="64" BorderBrush="White" BorderThickness="1">
+                    <Label Content="{Binding Name}"/>
+                </Border>
+                <Border Grid.Column="1" BorderBrush="White" BorderThickness="1" Padding="5">
+                    <CheckBox IsChecked="{Binding IsDefault}" IsEnabled="False" />
+                </Border>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="LayerItemTemplate" DataType="{x:Type domain:Layer}">
+            <Grid Height="64">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="8*" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Height="64" BorderBrush="White" BorderThickness="1">
+                    <Label Content="{Binding Name}"/>
+                </Border>
+                <Border Padding="5" Grid.Column="1" BorderBrush="White" BorderThickness="1">
+                    <CheckBox IsEnabled="False" IsChecked="{Binding IsDefault, Mode=OneWay}"/>
+                </Border>
+
+                <Grid Grid.Column="2" Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"
+                        VerticalAlignment="Stretch"
+                        FontFamily="Segoe UI Symbol"
+                        Content="&#xE110;"
+                        Command="{Binding DataContext.MoveLayerUpCommand, ElementName=listBox}"
+                        CommandParameter="{Binding .}" />
+                    <Button Grid.Row="1"
+                        VerticalAlignment="Stretch"
+                        FontFamily="Segoe UI Symbol"
+                        Content="&#xE1FD;"
+                        Command="{Binding DataContext.MoveLayerDownCommand, ElementName=listBox}"
+                        CommandParameter="{Binding .}" />
+                </Grid>
+                <Grid Grid.Column="3" Margin ="2">
+                    <Button
+                    FontFamily="Segoe UI Symbol"
+                    Content="&#xE115;"
+                    Height="30"
+                    Command="{Binding DataContext.EditLayerPropertiesCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                    CommandParameter="{Binding .}">
+                    </Button>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -14,62 +82,17 @@
             <RowDefinition Height="50" />
         </Grid.RowDefinitions>
 
+
         <ListBox Grid.Row="0" ItemsSource="{Binding Layers}" 
-             SelectedItem="{Binding SelectedLayer}"
-             HorizontalContentAlignment="Stretch"
-                 Name="listBox">
-            
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Grid Height="64">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="8*" />
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Border Grid.Column="0" Height="64" BorderBrush="White" BorderThickness="1">
-                            <Label Content="{Binding Name}"/>
-                        </Border>
-                        <Border Padding="5" Grid.Column="1" BorderBrush="White" BorderThickness="1">
-                            <CheckBox IsEnabled="False" IsChecked="{Binding IsDefault, Mode=OneWay}"/>
-                        </Border>
-
-                        <Grid Grid.Column="2" Margin="5">
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <Button Grid.Row="0"
-                                    VerticalAlignment="Stretch"
-                                    FontFamily="Segoe UI Symbol"
-                                    Content="&#xE110;"
-                                    Command="{Binding ElementName=listBox, Path=DataContext.MoveLayerUpCommand }"
-                                    CommandParameter="{Binding .}"
-                                    />
-
-                            <Button Grid.Row="1"
-                                    VerticalAlignment="Stretch"
-                                    FontFamily="Segoe UI Symbol"
-                                    Content="&#xE1FD;" 
-                                    Command="{Binding ElementName=listBox, Path=DataContext.MoveLayerDownCommand }"
-                                    CommandParameter="{Binding .}"
-                                    />
-                        </Grid>
-                        <Grid Grid.Column="3" Margin ="2">
-                            <Button
-                                FontFamily="Segoe UI Symbol"
-                                Content="&#xE115;"
-                                Height="30"
-                                Command="{ Binding ElementName=listBox, Path=DataContext.EditLayerPropertiesCommand }"
-                                CommandParameter="{Binding .}">
-                            </Button>
-                        </Grid>
-
-                    </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
+                 SelectedItem="{Binding SelectedLayer}"
+                 HorizontalContentAlignment="Stretch"
+                 Name="listBox"
+                 dd:DragDrop.IsDragSource="True"
+                 dd:DragDrop.IsDropTarget="True"
+                 dd:DragDrop.DefaultDragAdornerOpacity="0.75"
+                 dd:DragDrop.DragAdornerTemplate="{StaticResource LayerDragAdornerTemplate}"
+                 dd:DragDrop.SelectDroppedItems="True"
+                 ItemTemplate="{StaticResource LayerItemTemplate}">
         </ListBox>
 
         <Grid Grid.Row="1">
