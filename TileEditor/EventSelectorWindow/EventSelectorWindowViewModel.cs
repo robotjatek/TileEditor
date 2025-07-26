@@ -14,7 +14,8 @@ public partial class EventSelectorWindowViewModel : ObservableObject
     private static readonly LevelEvent[] events = [
         new OutroEvent(),
         new EscapeEvent(2, 6, 4, 0.0022, 0.002),
-        new BossEvent(20, 32, 32, 10, 10) // TODO: ezek a hardcoded default értékek nem valami szépek itt
+        new BossEvent(20, 32, 32, 10, 10), // TODO: ezek a hardcoded default értékek nem valami szépek itt
+        new GateEvent("")
      ];
 
     public event EventHandler? OnRequestClose;

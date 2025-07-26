@@ -382,11 +382,11 @@ public partial class MainWindowViewModel : ObservableObject
 
             return new GameObjectEntity
             {
-                // TODO: props
                 Type = gameObject.Type!,
                 XPos = posX,
                 YPos = posY,
-                Name = gameObject.Label
+                Name = gameObject.Label,
+                Props = gameObject.Props
             };
         }).Where(g => g != null).ToArray();
 
@@ -806,8 +806,8 @@ public partial class MainWindowViewModel : ObservableObject
                     Layers[levelEntity.DefaultLayer].Tiles[index].GameObject = new GameObject()
                     {
                         Type = go.Type,
-                        Name = go.Name
-                        // TODO: read props from entity
+                        Name = go.Name,
+                        Props = go.Props
                     };
                 }
 

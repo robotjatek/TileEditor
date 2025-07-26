@@ -46,7 +46,11 @@ public partial class EntitySelectorViewModel : ObservableObject
         },
         new GameObject
         {
-            Type = "lever"
+            Type = "lever",
+            Props = new Dictionary<string, object>
+            {
+                { "eventId", string.Empty }
+            }
         },
 
         new StartGameObject(),

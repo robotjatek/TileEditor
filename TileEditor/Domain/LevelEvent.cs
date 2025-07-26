@@ -97,3 +97,17 @@ public partial class BossEvent : LevelEvent
         Props["health"] = Health;
     }
 }
+
+public partial class GateEvent : LevelEvent
+{
+    [ObservableProperty]
+    private string _id = string.Empty;
+
+    public GateEvent(string id)
+    {
+        Type = "gate_event";
+        Id = id;
+
+        Props["id"] = Id;
+    }
+}

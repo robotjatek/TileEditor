@@ -5,17 +5,26 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 using TileEditor.Domain;
+using TileEditor.EventEditorWindow;
 
 namespace TileEditor;
 
-public partial class EntityEditorWindowViewModel(GameObject gameObject, IEnumerable<string> objectNames) : ObservableObject, IDataErrorInfo
+public partial class EntityEditorWindowViewModel : ObservableObject, IDataErrorInfo
 {
+    [ObservableProperty]
+    private GameObject? _gameObject;
+
+    [ObservableProperty]
+    private IEnumerable<string>? _objectNames;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasErrors))]
-    private string? _name = gameObject.Label;
+    private string? _name;
 
-    public ObservableCollection<string> ExistingStrings { get; } = new(objectNames);
+    public ObservableCollection<string> ExistingStrings { get; private set; }
+
+    [ObservableProperty]
+    private ObservableCollection<KvPair> _ps = [];
 
     public string Error => string.Empty;
 
@@ -29,7 +38,7 @@ public partial class EntityEditorWindowViewModel(GameObject gameObject, IEnumera
                     return "Name cannot be empty";
                 if (ExistingStrings.Contains(Name)
                     // Ignore the validation if the name is the same as the original name
-                    && !gameObject.Label.Equals(Name))
+                    && !GameObject!.Label.Equals(Name))
                     return "Name must be unique";
             }
             return string.Empty;
@@ -40,10 +49,34 @@ public partial class EntityEditorWindowViewModel(GameObject gameObject, IEnumera
 
     public event EventHandler? OnRequestClose;
 
+    public EntityEditorWindowViewModel(GameObject gameObject, IEnumerable<string> objectNames)
+    {
+        this.GameObject = gameObject;
+        this.ObjectNames = objectNames;
+        this.Name = gameObject.Label;
+        this.ExistingStrings = new ObservableCollection<string>(objectNames);
+
+        foreach (var item in gameObject.Props)
+        {
+            Ps.Add(new KvPair
+            {
+                Key = item.Key,
+                Value = item.Value.ToString()!
+            });
+        }
+    }
+
     [RelayCommand]
     private void OkClicked()
     {
-        gameObject.Name = _name;
+        GameObject!.Name = _name;
+
+        var d = new Dictionary<string, object>();
+        foreach (var item in _ps)
+        {
+            d.Add(item.Key, item.Value);
+        }
+        GameObject.Props = d;
 
         OnRequestClose?.Invoke(this, EventArgs.Empty);
     }

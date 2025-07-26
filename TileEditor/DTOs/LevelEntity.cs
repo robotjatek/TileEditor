@@ -18,6 +18,8 @@ public class GameObjectEntity
     public int YPos { get; set; }
 
     public string Name { get; set; }
+
+    public Dictionary<string, object> Props { get; set; } = [];
 }
 
 public class StartEntity

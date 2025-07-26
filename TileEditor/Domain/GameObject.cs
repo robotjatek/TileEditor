@@ -11,7 +11,9 @@ public partial class GameObject : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label))]
     private string? _name;
-    // TODO: props
+
+    [ObservableProperty]
+    public Dictionary<string, object> _props = [];
 
     public string Label
     {
@@ -23,7 +25,8 @@ public partial class GameObject : ObservableObject
         return new GameObject
         {
             Type = _type,
-            Name = _name
+            Name = _name,
+            Props = _props
         };
     }
 }

@@ -121,14 +121,15 @@
     <StackPanel VerticalAlignment="Center" Margin="5">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0">
+            <Grid Grid.Row="0" >
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="150"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
@@ -139,7 +140,7 @@
                 </Grid.RowDefinitions>
 
                 <Label Grid.Row="0" Grid.Column="0">Name</Label>
-                <TextBox Grid.Row="0" Grid.Column="1"  x:Name="tbEntityName" Margin="0, 0, 0, 25">
+                <TextBox Grid.Row="0" Grid.Column="1" x:Name="tbEntityName" Margin="0, 0, 0, 25">
                     <TextBox.Text>
                         <Binding Path="Name" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True">
                         </Binding>
@@ -148,9 +149,25 @@
 
             </Grid>
 
-            <Separator Grid.Row="1" />
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding Ps}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-            <Grid Grid.Row="2">
+                            <Label Grid.Column="0" Content="{Binding Key}" />
+                            <TextBox Grid.Column="1" Text="{Binding Value}" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Separator Grid.Row="2" />
+
+            <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition />
