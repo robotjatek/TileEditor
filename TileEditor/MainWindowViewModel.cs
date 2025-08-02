@@ -214,7 +214,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     private void ReceiveSelectedEvent(ValueChangedMessage<LevelEvent> message)
     {
-        if (!LevelEvents.Any(e => e.Type == message.Value.Type))
+
             LevelEvents.Add(message.Value);
     }
 

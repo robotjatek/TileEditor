@@ -5,10 +5,17 @@ namespace TileEditor.Domain;
 public partial class LevelEvent : ObservableObject
 {
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Label))]
     public string _type = "";
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Label))]
     public Dictionary<string, object> _props = [];
+
+    public string Label
+    {
+        get => string.IsNullOrEmpty(_props["id"].ToString()) ? _type ?? string.Empty : _props["id"].ToString()!;
+    }
 }
 
 public partial class EscapeEvent : LevelEvent
@@ -109,5 +116,6 @@ public partial class GateEvent : LevelEvent
         Id = id;
 
         Props["id"] = Id;
+        // TODO: propsba portcullis positions, enemy positions
     }
 }

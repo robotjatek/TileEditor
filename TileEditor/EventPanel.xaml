@@ -24,7 +24,7 @@
                         </Grid.ColumnDefinitions>
 
                         <Border Padding="5" Grid.Column="0" BorderBrush="White" BorderThickness="1">
-                            <TextBlock Text="{Binding Type}" />
+                            <TextBlock Text="{Binding Label}" />
                         </Border>
                         <Border Grid.Column="1">
                             <Grid Margin="5">
