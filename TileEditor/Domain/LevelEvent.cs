@@ -14,7 +14,19 @@ public partial class LevelEvent : ObservableObject
 
     public string Label
     {
-        get => string.IsNullOrEmpty(_props["id"].ToString()) ? _type ?? string.Empty : _props["id"].ToString()!;
+        get
+        {
+            if(_props.TryGetValue("id", out var idValue))
+            {
+                if (idValue is null || string.IsNullOrEmpty(idValue.ToString()))
+                    return _type;
+              
+                return idValue.ToString()!;
+            }
+
+            return _type;
+
+        }
     }
 }
 
@@ -110,12 +122,26 @@ public partial class GateEvent : LevelEvent
     [ObservableProperty]
     private string _id = string.Empty;
 
-    public GateEvent(string id)
+    [ObservableProperty]
+    private int _startX = 0;
+
+    [ObservableProperty]
+    private int _startY = 0;
+
+    [ObservableProperty]
+    private int _endY = 0;
+
+    public GateEvent(string id, int startX, int startY, int endY)
     {
         Type = "gate_event";
         Id = id;
+        StartX = startX;
+        StartY = startY;
+        EndY = endY;
 
         Props["id"] = Id;
-        // TODO: propsba portcullis positions, enemy positions
+        Props["startX"] = StartX;
+        Props["startY"] = StartY;
+        Props["endY"] = EndY;
     }
 }
