@@ -14,7 +14,19 @@ public partial class LevelEvent : ObservableObject
 
     public string Label
     {
-        get => string.IsNullOrEmpty(_props["id"].ToString()) ? _type ?? string.Empty : _props["id"].ToString()!;
+        get
+        {
+            if(_props.TryGetValue("id", out var idValue))
+            {
+                if (idValue is null)
+                    return _type;
+              
+                return idValue.ToString()!;
+            }
+
+            return _type;
+
+        }
     }
 }
 
